@@ -1,25 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import { connect } from "react-redux";
+import Channels from "./components/Channels";
+import Header from "./components/Header";
 
-function App() {
+function App({ ui }) {
+
+  console.log(ui)
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{backgroundColor: '#212121', height: '100vh', width: '100%'}}> 
+    <Header/>
+    <Channels />
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  ui: state.ui
+})
+
+
+export default connect(mapStateToProps, null)(App);
