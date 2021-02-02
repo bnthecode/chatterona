@@ -1,4 +1,5 @@
-import { Button, Input, Paper, TextField, Typography } from "@material-ui/core";
+import { Button, Input, Paper, TextField, Typography, Grid } from "@material-ui/core";
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 import { withStyles } from "@material-ui/styles";
 import React from "react";
 import { connect } from "react-redux";
@@ -41,7 +42,7 @@ class Chat extends React.Component {
         .collection("messages")
         .where("channelId", "==", selectedChannel.id)
         .get();
-        console.log(snapshot.docs.map((doc) => ({...doc.data(), id: doc.id})))
+      console.log(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
       return snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
@@ -65,7 +66,7 @@ class Chat extends React.Component {
     });
     const messages = await this.getMessages();
     this.setState({ messages });
-    this.messageRef.current.scrollIntoView({ behavior: 'smooth'});
+    this.messageRef.current.scrollIntoView({ behavior: 'smooth' });
   };
   render() {
     const { messages } = this.state;
@@ -126,39 +127,39 @@ class Chat extends React.Component {
               </Paper>
             ))
           ) : (
-            <Paper
-              style={{
-                minHeight: 40,
-                display: "flex",
-                flexDirection: "row",
-                margin: 12,
-                padding: 14,
-                backgroundColor: "#3b3b3b",
-                width: "80%",
-              }}
-            >
               <Paper
                 style={{
-                  backgroundImage: `url(https://images.unsplash.com/photo-1503797558227-76451ba6de08?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MzN8fGdvYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60)`,
-                  borderRadius: 20,
-                  backgroundSize: "contain",
-                  height: 40,
-                  width: 40,
-                }}
-              ></Paper>
-              <Typography
-                style={{
-                  fontSize: 14,
-                  marginLeft: 14,
-                  marginTop: 8,
-                  color: "white",
-                  fontWeight: 600,
+                  minHeight: 40,
+                  display: "flex",
+                  flexDirection: "row",
+                  margin: 12,
+                  padding: 14,
+                  backgroundColor: "#3b3b3b",
+                  width: "80%",
                 }}
               >
-                No messages in this channel! Send one to start a conversation.
+                <Paper
+                  style={{
+                    backgroundImage: `url(https://images.unsplash.com/photo-1503797558227-76451ba6de08?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MzN8fGdvYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60)`,
+                    borderRadius: 20,
+                    backgroundSize: "contain",
+                    height: 40,
+                    width: 40,
+                  }}
+                ></Paper>
+                <Typography
+                  style={{
+                    fontSize: 14,
+                    marginLeft: 14,
+                    marginTop: 8,
+                    color: "white",
+                    fontWeight: 600,
+                  }}
+                >
+                  No messages in this channel! Send one to start a conversation.
               </Typography>
-            </Paper>
-          )}
+              </Paper>
+            )}
         </div>
         <Button
           onClick={this.addMessage}
@@ -173,16 +174,24 @@ class Chat extends React.Component {
           {" "}
           Add a message
         </Button>
-        <div
-          style={{
-            position: "absolute",
-            backgroundColor: "#595959",
-            height: 48,
+        <Grid container spacing={2} style={{
+          position: "absolute",
+          backgroundColor: "#595959",
+          height: 48,
+          width: "100%",
+          bottom: 12,
+        }}>
+          <Grid item md={11}>
+          <TextField style={{position: "absolute",
+          height: 48,
+          width: "90%",
+          bottom: -7,}}/>
+          </Grid>
+          <Grid item alignItems='flex-end' md={1}>
+            <button><AddCircleIcon /></button>
+          </Grid>
+        </Grid>
 
-            width: "100%",
-            bottom: 12,
-          }}
-        ></div>
       </div>
     );
   }
