@@ -13,16 +13,25 @@ const Login = ({ handleLogin }) => {
   };
 
   return (
-    <div style={{ display: "grid", alignItems: "center" }}>
-      <Typography variant="h3"> You need to log in</Typography>
-      <Button
-        style={{ position: "absolute", top: "25%", left: "50%" }}
+
+      <div style={{ width: '600px', marginLeft: 'calc(50% - 300px)',  paddingTop: '200px',textAlign: 'center',
+       color: 'white'}}>
+      <Typography style={{ fontFamily: 'monospace', transform: 'rotate(-8deg)', fontSize: 92, marginBottom: 100, height: '50%', }} >
+        
+         Chatteroni
+         <div style={{width: 16, height: 16, borderRadius: 8, transform: 'rotate(-8deg)',
+          position: 'absolute', top: 34, right: 62, backgroundColor: '#3d1059'}}></div>
+         </Typography>
+         <Button
+        style={{ width: 300, backgroundColor: '#3d1059',  color: 'white', fontWeight: 600 }}
         onClick={login}
       >
         {" "}
         Log in
       </Button>
-    </div>
+         </div>
+  
+
   );
 };
 

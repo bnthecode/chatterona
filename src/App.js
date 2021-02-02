@@ -24,14 +24,15 @@ function App({ auth, logInUser }) {
 
   return (
     <div style={{ backgroundColor: "#4f4f4f", height: "100vh", width: "100%" }}>
-      {isLoggedIn ? (
+      {isLoggedIn && auth.user ? (
         <>
           <Header />
           <Channels />
           <Servers />
           <Chat />
           <Button
-            style={{ position: "absolute", top: 48, right: 20 }}
+           style={{ width: 120, backgroundColor: '#3d1059',  color: 'white', fontWeight: 600,
+           position: "absolute", top: 48, right: 20 }}
             onClick={logout}
           >
             {" "}
