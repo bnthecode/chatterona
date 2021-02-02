@@ -4,6 +4,7 @@ import {
   Divider,
   makeStyles,
   Typography,
+  Paper
 } from "@material-ui/core";
 import Drawer from "./Drawer";
 import VideogameAssetIcon from "@material-ui/icons/VideogameAsset";
@@ -12,18 +13,24 @@ import db from "../firebase";
 import { useEffect, useState } from "react";
 import { setServerRedux } from "../redux/actions/appActions";
 import { connect } from "react-redux";
+
 const useStyles = makeStyles((theme) => ({
   btn: {
-    height: 60,
-    width: 60,
-    minHeight: 60,
-    color: "white",
-    borderRadius: "50%",
-    backgroundColor: theme.palette.primary.dark,
-    margin: 8,
+    height: 40,
+    width: 40,
+    minHeight: 40,
+    color: "#20b673",
+    borderRadius: 20,
+    backgroundSize: 'contain',
+    backgroundColor: theme.palette.secondary.dark,
+    margin: 6,
+    display: 'grid',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
     "&:hover": {
       transition: "all .25s",
-      backgroundColor: theme.palette.primary.dark,
+      color: 'white',
       borderRadius: "40%",
     },
   },
@@ -45,6 +52,7 @@ const Servers = ({ setServer, serverId }) => {
     const serverName = prompt("Enter a name");
     await db.collection("servers").add({
       name: serverName,
+      imgUrl: 'https://images.unsplash.com/photo-1493612276216-ee3925520721?ixid=MXwxMjA3fDB8MHxzZWFyY2h8M3x8cmFuZG9tfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
       country: "USA",
       timestamp: new Date()
     });
@@ -61,33 +69,31 @@ const Servers = ({ setServer, serverId }) => {
           overflowY: 'hidden',
         display: "flex",
         alignItems: "center",
-        borderRight: "1px solid #eee",
+        borderRight: "1px solid #1e1e1e",
+        backgroundColor: '#1e1e1e'
       }}
       width="85px"
       variant="secondary"
     >
-      <Button className={classes.btn}>
+      <div className={classes.btn}>
         <VideogameAssetIcon />
-      </Button>
+      </div>
       <Divider
         style={{
-          backgroundColor: "white",
+          backgroundColor: "#1e1e1e",
           margin: "0 16px 0 16px",
           height: 1,
           width: "calc(100% - 32px)",
         }}
       />
       {servers.map((svr) => (
-        <Button onClick={() => setServer(svr)} className={classes.btn}>
-          <Avatar style={{ backgroundColor: "transparent" }}>
-            {" "}
-            {svr.name.charAt(0)}{" "}
-          </Avatar>
-        </Button>
+          <Paper style={{backgroundImage: `url(${svr.imgUrl})` }} onClick={() => setServer(svr)} className={classes.btn} >
+          </Paper>
+    
       ))}
-      <Button className={classes.btn}>
+      <div className={classes.btn}>
         <AddIcon onClick={addServer} />
-      </Button>
+      </div>
     </Drawer>
   );
 };

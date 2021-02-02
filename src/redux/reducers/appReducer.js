@@ -1,32 +1,35 @@
 const initialState = {
   selectedServer: {
-    name: '',
-    id: '',
+    name: "",
+    id: "",
   },
-  channelId: ''
+  selectedChannel: {
+    name: "",
+    id: "",
+  },
 };
 
 const appReducer = (state = initialState, action) => {
   switch (action.type) {
-
     // servers
-    case "SET_SERVER_ID": {
+    case "SET_SERVER": {
       return {
         ...state,
         selectedServer: action.payload,
       };
     }
     // channels
-    case "SET_CHANNEL_ID": {
+    case "SET_CHANNEL": {
       return {
-        channelId: action.payload,
         ...state,
+        selectedChannel: action.payload,
       };
     }
 
-    default: {
-      return initialState;
-    }
+    default:
+      return {
+        ...state,
+      };
   }
 };
 
