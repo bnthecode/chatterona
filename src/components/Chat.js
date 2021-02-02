@@ -1,5 +1,12 @@
-import { Button, Input, Paper, TextField, Typography, Grid } from "@material-ui/core";
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import {
+  Button,
+  Input,
+  Paper,
+  TextField,
+  Typography,
+  Grid,
+} from "@material-ui/core";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { withStyles } from "@material-ui/styles";
 import React from "react";
 import { connect } from "react-redux";
@@ -23,6 +30,15 @@ class Chat extends React.Component {
   };
 
   componentDidMount = async () => {
+
+const { selectedChannel } = this.props;
+    db.collection("channels").doc(selectedChannel.id)
+    .onSnapshot(function(doc) {
+        console.log(doc.data())
+    });
+
+
+
     const messages = await this.getMessages();
     this.setState({ messages });
   };
@@ -36,25 +52,32 @@ class Chat extends React.Component {
 
   getMessages = async () => {
     const { selectedChannel } = this.props;
-    console.log("trying....");
     if (selectedChannel.id) {
       const snapshot = await db
         .collection("messages")
         .where("channelId", "==", selectedChannel.id)
         .get();
-      console.log(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })))
-      return snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      })).sort((a, b) => (a.timestamp > b.timestamp) ? 1 : -1);
+      return snapshot.docs
+        .map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }))
+        .sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1));
     }
     return [];
+  };
+
+  addMessageToChannel = async (id) => {
+    const { selectedChannel, user } = this.props;
+    await db.collection("channels")
+      .doc(selectedChannel.id)
+      .set({ messages: [{ id: id, when: new Date() }] }, { merge: true });
   };
 
   addMessage = async () => {
     const { selectedChannel, user } = this.props;
     const message = prompt("What would you like to say?");
-    await db.collection("messages").add({
+    const dbMessage = await db.collection("messages").add({
       channelId: selectedChannel.id,
       message: message,
       timestamp: new Date(),
@@ -64,9 +87,11 @@ class Chat extends React.Component {
         photoURL: user.photoURL,
       },
     });
+    this.addMessageToChannel(dbMessage.id)
+
     const messages = await this.getMessages();
     this.setState({ messages });
-    this.messageRef.current.scrollIntoView({ behavior: 'smooth' });
+    this.messageRef.current.scrollIntoView({ behavior: "smooth" });
   };
   render() {
     const { messages } = this.state;
@@ -127,39 +152,39 @@ class Chat extends React.Component {
               </Paper>
             ))
           ) : (
+            <Paper
+              style={{
+                minHeight: 40,
+                display: "flex",
+                flexDirection: "row",
+                margin: 12,
+                padding: 14,
+                backgroundColor: "#3b3b3b",
+                width: "80%",
+              }}
+            >
               <Paper
                 style={{
-                  minHeight: 40,
-                  display: "flex",
-                  flexDirection: "row",
-                  margin: 12,
-                  padding: 14,
-                  backgroundColor: "#3b3b3b",
-                  width: "80%",
+                  backgroundImage: `url(https://images.unsplash.com/photo-1503797558227-76451ba6de08?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MzN8fGdvYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60)`,
+                  borderRadius: 20,
+                  backgroundSize: "contain",
+                  height: 40,
+                  width: 40,
+                }}
+              ></Paper>
+              <Typography
+                style={{
+                  fontSize: 14,
+                  marginLeft: 14,
+                  marginTop: 8,
+                  color: "white",
+                  fontWeight: 600,
                 }}
               >
-                <Paper
-                  style={{
-                    backgroundImage: `url(https://images.unsplash.com/photo-1503797558227-76451ba6de08?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MzN8fGdvYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60)`,
-                    borderRadius: 20,
-                    backgroundSize: "contain",
-                    height: 40,
-                    width: 40,
-                  }}
-                ></Paper>
-                <Typography
-                  style={{
-                    fontSize: 14,
-                    marginLeft: 14,
-                    marginTop: 8,
-                    color: "white",
-                    fontWeight: 600,
-                  }}
-                >
-                  No messages in this channel! Send one to start a conversation.
+                No messages in this channel! Send one to start a conversation.
               </Typography>
-              </Paper>
-            )}
+            </Paper>
+          )}
         </div>
         <Button
           onClick={this.addMessage}
@@ -174,24 +199,33 @@ class Chat extends React.Component {
           {" "}
           Add a message
         </Button>
-        <Grid container spacing={2} style={{
-          position: "absolute",
-          backgroundColor: "#595959",
-          height: 48,
-          width: "100%",
-          bottom: 12,
-        }}>
+        <Grid
+          container
+          spacing={2}
+          style={{
+            position: "absolute",
+            backgroundColor: "#595959",
+            height: 48,
+            width: "100%",
+            bottom: 12,
+          }}
+        >
           <Grid item md={11}>
-          <TextField style={{position: "absolute",
-          height: 48,
-          width: "90%",
-          bottom: -7,}}/>
+            <TextField
+              style={{
+                position: "absolute",
+                height: 48,
+                width: "90%",
+                bottom: -7,
+              }}
+            />
           </Grid>
-          <Grid item alignItems='flex-end' md={1}>
-            <button><AddCircleIcon /></button>
+          <Grid item alignItems="flex-end" md={1}>
+            <button>
+              <AddCircleIcon />
+            </button>
           </Grid>
         </Grid>
-
       </div>
     );
   }
