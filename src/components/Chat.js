@@ -29,70 +29,34 @@ class Chat extends React.Component {
     messages: [],
   };
 
-  componentDidMount = async () => {
-
-const { selectedChannel } = this.props;
-    db.collection("channels").doc(selectedChannel.id)
-    .onSnapshot(function(doc) {
-        console.log(doc.data())
-    });
-
-
-
-    const messages = await this.getMessages();
-    this.setState({ messages });
-  };
-
-  componentDidUpdate = async (prevProps) => {
-    if (this.props.selectedChannel.id !== prevProps.selectedChannel.id) {
-      const messages = await this.getMessages();
-      this.setState({ messages });
-    }
-  };
-
-  getMessages = async () => {
+  componentDidMount = () => {
     const { selectedChannel } = this.props;
-    if (selectedChannel.id) {
-      const snapshot = await db
-        .collection("messages")
-        .where("channelId", "==", selectedChannel.id)
-        .get();
-      return snapshot.docs
-        .map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }))
-        .sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1));
-    }
-    return [];
-  };
-
-  addMessageToChannel = async (id) => {
-    const { selectedChannel, user } = this.props;
-    await db.collection("channels")
+    db.collection("channels")
       .doc(selectedChannel.id)
-      .set({ messages: [{ id: id, when: new Date() }] }, { merge: true });
+      .onSnapshot((doc) => {
+        const { messages } = doc.data();
+        this.updateMessages(messages);
+      });
   };
 
-  addMessage = async () => {
+  updateMessages = (messages) => this.setState({ messages });
+
+  addMessageToChannel = async () => {
     const { selectedChannel, user } = this.props;
-    const message = prompt("What would you like to say?");
-    const dbMessage = await db.collection("messages").add({
-      channelId: selectedChannel.id,
-      message: message,
-      timestamp: new Date(),
-      author: {
-        name: user.displayName,
-        time: new Date(),
-        photoURL: user.photoURL,
-      },
-    });
-    this.addMessageToChannel(dbMessage.id)
-
-    const messages = await this.getMessages();
-    this.setState({ messages });
-    this.messageRef.current.scrollIntoView({ behavior: "smooth" });
+    const content = prompt("What would you like to say?");
+    await db
+      .collection("channels")
+      .doc(selectedChannel.id)
+      .set(
+        {
+          messages: [
+            { when: new Date(), content, author: { photoURL: user.photoURL } },
+          ],
+        },
+        { merge: true }
+      );
   };
+
   render() {
     const { messages } = this.state;
     const { classes } = this.state;
@@ -130,7 +94,7 @@ const { selectedChannel } = this.props;
               >
                 <Paper
                   style={{
-                    backgroundImage: `url(${msg.author.photoURL})`,
+                    backgroundImage: `url(${msg.author ? msg.author.photoURL : ''})`,
                     borderRadius: 20,
                     backgroundSize: "contain",
                     height: 40,
@@ -187,7 +151,7 @@ const { selectedChannel } = this.props;
           )}
         </div>
         <Button
-          onClick={this.addMessage}
+          onClick={this.addMessageToChannel}
           style={{
             position: "absolute",
             backgroundColor: "#595959",
