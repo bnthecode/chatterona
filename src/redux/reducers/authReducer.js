@@ -3,8 +3,9 @@ const initialState = {};
 const authReducer = (state = initialState, action) => {
 
     switch(action.type) {
-
-        case 'SET_AUTH_USER': {
+   
+        case 'LOG_USER_IN': {
+            console.log(action.payload)
             // update spinner state
             return {
                 user: action.payload,
