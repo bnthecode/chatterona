@@ -9,10 +9,6 @@ import { logInUserRedux } from "./redux/actions/authActions";
 
 function App({ auth, logInUser }) {
 
-
-  useEffect(() => {
-    console.log('auth is changing....', auth.user)
-  }, [auth.user]);
   const [isLoggedIn, setLoggedIn] = useState(firebaseAuth.currentUser);
 
   const handleLogin = (user) => {
@@ -56,3 +52,14 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
+
+
+
+
+
+
+
+// collections
+  // servers -->
+       // --> channels
+            // ---> message 
