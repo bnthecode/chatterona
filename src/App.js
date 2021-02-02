@@ -10,7 +10,7 @@ import Login from "./pages/Login";
 import { logInUserRedux } from "./redux/actions/authActions";
 import Chat from "./components/Chat";
 
-function App({ auth, logInUser }) {
+function App({ auth, logInUser, selectedChannel }) {
   const [isLoggedIn, setLoggedIn] = useState(firebaseAuth.currentUser);
   const handleLogin = (user) => {
     logInUser(user);
@@ -29,7 +29,7 @@ function App({ auth, logInUser }) {
           <Header />
           <Channels />
           <Servers />
-          <Chat />
+          { selectedChannel.id ? <Chat /> : '' }
           <Button
            style={{ width: 120, backgroundColor: '#3d1059',  color: 'white', fontWeight: 600,
            position: "absolute", top: 48, right: 20 }}
@@ -48,6 +48,7 @@ function App({ auth, logInUser }) {
 
 const mapStateToProps = (state) => ({
   auth: state.auth,
+  selectedChannel: state.app.selectedChannel,
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -4,14 +4,15 @@ import {
   Divider,
   makeStyles,
   Typography,
-  Paper
+  Paper,
+  Tooltip
 } from "@material-ui/core";
 import Drawer from "./Drawer";
 import VideogameAssetIcon from "@material-ui/icons/VideogameAsset";
 import AddIcon from "@material-ui/icons/Add";
 import db from "../firebase";
 import { useEffect, useState } from "react";
-import { setServerRedux } from "../redux/actions/appActions";
+import { setChannelRedux, setServerRedux } from "../redux/actions/appActions";
 import { connect } from "react-redux";
 
 const useStyles = makeStyles((theme) => ({
@@ -35,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const Servers = ({ setServer, serverId }) => {
+const Servers = ({ setServer, setChannel, serverId }) => {
   const [servers, setServers] = useState([]);
 
   useEffect(async () => {
@@ -87,9 +88,10 @@ const Servers = ({ setServer, serverId }) => {
         }}
       />
       {servers.map((svr) => (
-          <Paper style={{backgroundImage: `url(${svr.imgUrl})` }} onClick={() => setServer(svr)} className={classes.btn} >
+        <Tooltip style={{ fontSize: 12}} placement="right" title={svr.name}>
+          <Paper style={{backgroundImage: `url(${svr.imgUrl})` }} onClick={() => [setServer(svr), setChannel({})]} className={classes.btn} >
           </Paper>
-    
+          </Tooltip>
       ))}
       <div className={classes.btn}>
         <AddIcon onClick={addServer} />
@@ -104,5 +106,6 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     setServer: dispatch(setServerRedux),
+    setChannel: dispatch(setChannelRedux),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Servers);
