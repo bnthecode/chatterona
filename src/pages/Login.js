@@ -4,13 +4,14 @@ import { auth, provider } from "../firebase";
 import { logInUserRedux } from "../redux/actions/authActions";
 
 const Login = ({ handleLogin }) => {
-  const login = () => {
 
+  const login = () => {
     auth
       .signInWithPopup(provider)
       .then((user) => handleLogin(user))
-      .catch((err) => alert(err));
+      .catch(() => handleLogin(null));
   };
+
   return (
     <div style={{ display: "grid", alignItems: "center" }}>
       <Typography variant="h3"> You need to log in</Typography>

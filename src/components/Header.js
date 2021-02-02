@@ -6,7 +6,13 @@ import Toolbar from '@material-ui/core/Toolbar';
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    position: 'absolute',
+    top: 0,
+    width: 'calc(100% - 360px)',
+    left: 360,
   },
+  toolbar: {
+  }
 }));
 
 const Header = () => {

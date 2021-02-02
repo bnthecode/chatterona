@@ -12,8 +12,8 @@ import { logInUserRedux } from "./redux/actions/authActions";
 function App({ auth, logInUser }) {
 
   const [isLoggedIn, setLoggedIn] = useState(firebaseAuth.currentUser);
-  const [serverId, setServerId] = useState()
-  const [channelId, setChannelId] = useState()
+  // const [serverId, setServerId] = useState()
+  // const [channelId, setChannelId] = useState()
 
   const handleLogin = (user) => {
     logInUser(user);
@@ -26,36 +26,36 @@ function App({ auth, logInUser }) {
     firebaseAuth.signOut().then(user => setLoggedIn(false));
   }
 
-  const addCollection = () => {
-    db.collection("server").add({
-      name: "First Server",
-      country: "USA",
-    })
-      .then(docRef => setServerId(docRef.id))
-      console.log("server added")
-  }
+  // const addCollection = () => {
+  //   db.collection("server").add({
+  //     name: "First Server",
+  //     country: "USA",
+  //   })
+  //     .then(docRef => setServerId(docRef.id))
+  //     console.log("server added")
+  // }
 
-  const addChannel = () => {
-    db.collection('channels').add({
-      serverId: serverId,
-      name: "channelNumber1",
-    })
-    .then(docRef => setChannelId(docRef.id))
-    console.log("channel added")
-  }
+  // const addChannel = () => {
+  //   db.collection('channels').add({
+  //     serverId: serverId,
+  //     name: "channelNumber1",
+  //   })
+  //   .then(docRef => setChannelId(docRef.id))
+  //   console.log("channel added")
+  // }
 
-  const addMessages = () => {
-    db.collection('messages').add({
-      channelId: channelId,
-      user: "Evan",
-      message: "Hey this is the first message",
-      //timeStamp: db.FieldValue.serverTimestamp()
-    })
-    console.log("message added")
-  }
+  // const addMessages = () => {
+  //   db.collection('messages').add({
+  //     channelId: channelId,
+  //     user: "Evan",
+  //     message: "Hey this is the first message",
+  //     //timeStamp: db.FieldValue.serverTimestamp()
+  //   })
+  //   console.log("message added")
+  // }
 
   return (
-    <div style={{ backgroundColor: "#212121", height: "100vh", width: "100%" }}>
+    <div style={{ backgroundColor: "#eee", height: '100vh', width: "100%" }}>
       {isLoggedIn ? (
         <>
           <Header />
@@ -68,7 +68,7 @@ function App({ auth, logInUser }) {
             {" "}
             Log out
           </Button>
-          <Button
+          {/* <Button
             style={{ position: "absolute", top: "45%", left: "50%" }}
             onClick={addCollection}
           >
@@ -85,7 +85,7 @@ function App({ auth, logInUser }) {
             onClick={addMessages}
           >
             Create a Message
-          </Button>
+          </Button> */}
         </>
       ) : (
           <Login handleLogin={handleLogin} />

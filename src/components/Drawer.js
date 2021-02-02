@@ -1,14 +1,15 @@
 import { Drawer as MuiDrawer, makeStyles } from "@material-ui/core";
 
-const Drawer = ({ width, variant }) => {
+const Drawer = ({ width, variant, children, ...rest }) => {
 
     const useStyles = makeStyles((theme) => ({
         drawerWrapper: {
+
             position: 'absolute',
-            top: 64,
             width: width || '20%',
-            height: `calc(100vh - 64px)`,
-            backgroundColor: theme.palette[variant].light
+            height: '100vh',
+
+            backgroundColor: theme.palette.secondary.light,
         },
     }));
 
@@ -18,10 +19,13 @@ const Drawer = ({ width, variant }) => {
             open
             PaperProps={{
                 className: classes.drawerWrapper,
+                ...rest,
             }}
             anchor="left"
             variant="persistent"
         >
+            {children}
+
         </MuiDrawer>
     );
 };
