@@ -41,10 +41,11 @@ class Chat extends React.Component {
         .collection("messages")
         .where("channelId", "==", selectedChannel.id)
         .get();
+        console.log(snapshot.docs.map((doc) => ({...doc.data(), id: doc.id})))
       return snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
-      }));
+      })).sort((a, b) => (a.timestamp > b.timestamp) ? 1 : -1);
     }
     return [];
   };

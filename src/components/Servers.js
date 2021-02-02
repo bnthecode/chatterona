@@ -8,6 +8,7 @@ import {
   Tooltip
 } from "@material-ui/core";
 import Drawer from "./Drawer";
+import ServerModal from './ServerModal'
 import VideogameAssetIcon from "@material-ui/icons/VideogameAsset";
 import AddIcon from "@material-ui/icons/Add";
 import db from "../firebase";
@@ -49,6 +50,7 @@ const Servers = ({ setServer, setChannel, serverId }) => {
     return snapshot.docs.map((doc) => ({...doc.data(), id: doc.id }));
 
   };
+
   const addServer = async () => {
     const serverName = prompt("Enter a name");
     await db.collection("servers").add({
@@ -96,6 +98,7 @@ const Servers = ({ setServer, setChannel, serverId }) => {
       <div className={classes.btn}>
         <AddIcon onClick={addServer} />
       </div>
+      <ServerModal addServer ={addServer} />
     </Drawer>
   );
 };
