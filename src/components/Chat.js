@@ -35,11 +35,12 @@ class Chat extends React.Component {
       .doc(selectedChannel.id)
       .onSnapshot((doc) => {
         const { messages } = doc.data();
+        console.log(messages)
         this.updateMessages(messages);
       });
   };
 
-  updateMessages = (messages) => this.setState({ messages });
+  updateMessages = (messages) =>  this.setState({ messages });
 
   addMessageToChannel = async () => {
     const { selectedChannel, user } = this.props;
@@ -47,13 +48,11 @@ class Chat extends React.Component {
     await db
       .collection("channels")
       .doc(selectedChannel.id)
-      .set(
+      .update(
         {
-          messages: [
-            { when: new Date(), content, author: { photoURL: user.photoURL } },
-          ],
-        },
-        { merge: true }
+          messages: { when: new Date(), content, author: { photoURL: user.photoURL } },
+        
+        }
       );
   };
 
@@ -111,7 +110,7 @@ class Chat extends React.Component {
                   }}
                 >
                   {" "}
-                  {msg.message}
+                  {msg.content}
                 </Typography>
               </Paper>
             ))
