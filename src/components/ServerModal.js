@@ -2,15 +2,15 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import AddIcon from '@material-ui/icons/Add';
-import { FormControl, InputLabel, Input } from '@material-ui/core';
+import { FormControl, InputLabel, Input, Button, Grid } from '@material-ui/core';
 
 function rand() {
     return Math.round(Math.random() * 20) - 10;
 }
 
 function getModalStyle() {
-    const top = 50 + rand();
-    const left = 50 + rand();
+    const top = 50
+    const left = 50
 
     return {
         top: `${top}%`,
@@ -62,6 +62,24 @@ export default function ServerModal() {
         setOpen(false);
     };
 
+    const body = (
+        <>
+            <div style={modalStyle} className={classes.paper}>
+                <Grid container>
+                    <Grid item sm={8}>
+                        <FormControl>
+                            <InputLabel htmlFor="my-input">Enter Server Name:</InputLabel>
+                            <Input id="my-input" aria-describedby="my-helper-text" />
+                        </FormControl>
+                    </Grid>
+                    <Grid item sm={4}>
+                        <Button className={classes.btn}>Add Server</Button>
+                    </Grid>
+                </Grid>
+            </div>
+        </>
+    );
+
     return (
         <div>
             <button type="button" className={classes.btn} onClick={handleOpen}>
@@ -73,12 +91,7 @@ export default function ServerModal() {
                 aria-labelledby="simple-modal-title"
                 aria-describedby="simple-modal-description"
             >
-                <div style={modalStyle} className={classes.paper}>
-                    <FormControl>
-                        <InputLabel htmlFor="my-input" style={{ color: "white" }}>Enter Server Name:</InputLabel>
-                        <Input id="my-input" aria-describedby="my-helper-text" />
-                    </FormControl>
-                </div>
+                {body}
             </Modal>
         </div>
     );
