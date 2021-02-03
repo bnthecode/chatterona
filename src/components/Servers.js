@@ -42,7 +42,18 @@ const Servers = ({ setServer, setChannel, serverId, user }) => {
       setServers(servers);
     }
     fetchServers();
+    registerServerListener();
   }, []);
+
+
+  const registerServerListener = () => {
+    db.collection("servers")
+    .onSnapshot(function(snapshot) {
+      snapshot.docChanges().forEach((change) => {
+        setServers([...servers, change.doc.data()])
+    });
+    });
+  }
 
   const getServers = async () => {
     const snapshot = await db.collection("servers").get();
