@@ -13,11 +13,36 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     position: "absolute",
     top: 0,
-    width: "calc(100% - 360px)",
-    left: 360,
+    width: "calc(100% - 312px)",
+    left: 312,
   },
   appbar: {
-    height: 40,
+    height: 46,
+  },
+  headerText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: 700,
+  },
+  headerIcon: {
+    marginRight: 10,
+  },
+  dividerWrapper: {
+    width: 20,
+    marginBottom: 22,
+  },
+  divider: {
+    height: 20,
+    width: 2,
+    backgroundColor: "white",
+  },
+  subHeaderWrapper: {
+    width: 100, marginBottom: 20
+  },
+  subHeaderText: {
+    color: "grey",
+    fontSize: 14,
+    fontWeight: 700,
   },
 }));
 
@@ -28,44 +53,34 @@ const Header = ({ selectedChannel }) => {
     return selectedChannel.name ? (
       <>
         <div style={{ marginBottom: 22, marginRight: 16 }}>
-          <Typography
-            style={{
-              color: "white",
-              fontSize: 14,
-              fontWeight: 800,
-            }}
-            variant="body1"
-          >
+          <Typography className={classes.headerText} variant="body1">
             <FontAwesomeIcon
-              style={{ marginRight: 10 }}
+              className={classes.headerIcon}
               color="white"
               icon={selectedChannel.voice ? faVolumeUp : faHashtag}
             ></FontAwesomeIcon>
             {selectedChannel.name}
           </Typography>
         </div>
-        <div style={{ width: 20, marginBottom: 22 }}>
-          <Divider style={{ height: 20, width: 2, backgroundColor: "white" }} />
+        <div className={classes.dividerWrapper}>
+          <Divider className={classes.divider} />
         </div>
-        <div style={{ width: 100, marginBottom: 20 }}>
-          <Typography
-            style={{
-              color: "grey",
-              fontSize: 14,
-              fontWeight: 700,
-            }}
-            variant="body1"
-          >
-            {selectedChannel.description ? truncateString(selectedChannel.description, 12) : "No description"}
+        <div className={classes.subHeaderWrapper}>
+          <Typography className={classes.subHeaderText} variant="body1">
+            {selectedChannel.description
+              ? truncateString(selectedChannel.description, 12)
+              : "No description"}
           </Typography>
         </div>
       </>
-    ) : '';
+    ) : (
+      ""
+    );
   };
 
   return (
     <div className={classes.root}>
-      <AppBar className={classes.appbar} position="static">
+      <AppBar elevation={2} className={classes.appbar} position="static">
         <Toolbar>{renderSelectedChannel()}</Toolbar>
       </AppBar>
     </div>

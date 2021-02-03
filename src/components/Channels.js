@@ -1,83 +1,34 @@
-import { faHashtag, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Typography,
   Grid,
   Divider,
   List,
-  ListItem,
-  ListItemText,
   Paper,
-  makeStyles,
 } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import db from "../firebase";
-import { setChannelRedux } from "../redux/actions/appActions";
-import { truncateString } from "../utilities";
+import { channelService } from "../services";
 import ChannelHeader from "./ChannelHeader";
+import ChannelListItem from "./ChannelListItem";
 import Drawer from "./Drawer";
 import HeaderOptions from "./HeaderOptions";
 
-const useStyles = makeStyles((theme) => ({
-  channelItem: {
-    color: "white",
-    width: "100%",
-    "&:hover": {
-      backgroundColor: "#4f4f4f",
-    },
-    "&:focus": {
-      backgroundColor: "#4f4f4f",
-    },
-    borderRadius: 6,
-  },
-}));
-
 const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
-  const classes = useStyles();
-
-
-
   const [channels, setChannels] = useState([]);
   const [headerOptions, showHeaderOptions] = useState(false);
 
   useEffect(() => {
-
-    const gatherChannelData = async () => {
-      const snapshot = await db
-        .collection("channels")
-        .where("serverId", "==", selectedServer.id)
-        .get();
-      return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-    };
-
     const fetchChannels = async () => {
       if (selectedServer.id) {
-        const channels = await gatherChannelData();
+        const channels = await channelService.getChannels(selectedServer.id);
         setChannels(channels);
       }
     };
     fetchChannels();
   }, [selectedServer.id]);
 
-  const getChannels = async () => {
-    const snapshot = await db
-      .collection("channels")
-      .where("serverId", "==", selectedServer.id)
-      .get();
-    return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-  };
-
-  const addChannel = async () => {
-    const name = prompt("What do you want you your channel to be named?");
-    await db.collection("channels").add({
-      serverId: selectedServer.id,
-      name: name,
-      timestamp: new Date(),
-      messages: [],
-      voice: true,
-    });
-    const channels = await getChannels();
+  const handleAddChannel = async () => {
+    await channelService.addChannel(selectedServer.id);
+    const channels = await channelService.getChannels(selectedServer.id);
     setChannels(channels);
     toggleHeaderOptions();
   };
@@ -85,8 +36,8 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   const toggleHeaderOptions = () => showHeaderOptions(!headerOptions);
 
   return (
-    <Drawer width="360px" style={{ backgroundColor: "#3b3b3b" }}>
-      <div style={{ paddingLeft: "86px" }}>
+    <Drawer anchor="left" width="310px" style={{ backgroundColor: "#23272a" }}>
+      <div style={{ paddingLeft: "72px" }}>
         <ChannelHeader
           serverName={selectedServer.name}
           toggleHeaderOptions={toggleHeaderOptions}
@@ -96,29 +47,13 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
         />
         <Grid container>
           <List style={{ width: "100%", margin: 4 }}>
-            {channels.map((chnl) => (
-              <ListItem
-                onClick={() => setChannel(chnl)}
-                className={classes.channelItem}
+            {channels ? channels.map((chnl) => (
+              <ChannelListItem
                 selected={chnl.id === selectedChannel.id}
-                disableRipple={true}
-                dense
-                button
-              >
-                <ListItemText
-                  primary={
-                    <Typography style={{ fontWeight: 600, fontSize: 14 }}>
-                      <FontAwesomeIcon
-                        style={{ marginRight: 8 }}
-                        color="#636363"
-                        icon={chnl.voice ? faVolumeUp : faHashtag}
-                      ></FontAwesomeIcon>
-                      {truncateString(chnl.name, 26)}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
+                setChannel={setChannel}
+                channel={chnl}
+              />
+            )): ''}
           </List>
         </Grid>
         <Paper
@@ -126,8 +61,8 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
             position: "absolute",
             backgroundColor: "#282828",
             bottom: 0,
-            height: 50,
-            width: "calc(100% - 86px)",
+            height: 52,
+            width: "calc(100% - 72px)",
           }}
         >
           <Paper
@@ -166,7 +101,7 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
                 left: 60,
                 fontSize: 12,
                 color: "white",
-                fontWeight: 800,
+                fontWeight: 700,
               }}
             >
               <span style={{ whiteSpace: "nowrap" }}>{user.displayName}</span>
@@ -174,19 +109,12 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
           </Paper>
         </Paper>
       </div>
-      <HeaderOptions addChannel={addChannel} headerOptions={headerOptions} />
+      <HeaderOptions
+        handleAddChannel={handleAddChannel}
+        headerOptions={headerOptions}
+      />
     </Drawer>
   );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  setChannel: dispatch(setChannelRedux),
-});
-
-const mapStateToProps = (state) => ({
-  selectedServer: state.app.selectedServer,
-  selectedChannel: state.app.selectedChannel,
-  user: state.auth.user,
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Channels);
+export default Channels;

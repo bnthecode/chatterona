@@ -19,32 +19,49 @@ const useStyles = makeStyles((theme) => ({
     },
     borderRadius: 6,
   },
+  menu: {
+    position: "absolute",
+    top: 46,
+    left: 92,
+    padding: 6,
+    width: "calc(100% - 110px)",
+    backgroundColor: "#1e1e1e",
+  }, 
+  menuItem: {
+    fontSize: 12, fontWeight: 600
+  }
 }));
-const HeaderOptions = ({ headerOptions, addChannel }) => {
+const HeaderOptions = ({ headerOptions, inviteFriends, handleAddChannel }) => {
   const classes = useStyles();
   return (
     <Grow in={headerOptions}>
-      <Paper
-        style={{
-          position: "absolute",
-          top: 46,
-          left: 92,
-          padding: 6,
-          width: "calc(100% - 110px)",
-          backgroundColor: "#1e1e1e",
-        }}
-      >
+      <Paper className={classes.menu}>
         <List>
           <ListItem
-            onClick={addChannel}
+            onClick={handleAddChannel}
             className={classes.headerItem}
             dense
             button
           >
             <ListItemText
               primary={
-                <Typography style={{ fontSize: 12, fontWeight: 600 }}>
+                <Typography className={classes.menuItem}>
                   Add a channel
+                </Typography>
+              }
+            ></ListItemText>
+            <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+          </ListItem>
+          <ListItem
+            onClick={inviteFriends}
+            className={classes.headerItem}
+            dense
+            button
+          >
+            <ListItemText
+              primary={
+                <Typography className={classes.menuItem}>
+                  Invite friends
                 </Typography>
               }
             ></ListItemText>
