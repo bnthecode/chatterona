@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import db from "../firebase";
 import { setChannelRedux } from "../redux/actions/appActions";
+import { channelService } from "../services";
 import { truncateString } from "../utilities";
 import ChannelHeader from "./ChannelHeader";
 import Drawer from "./Drawer";
@@ -35,49 +36,22 @@ const useStyles = makeStyles((theme) => ({
 
 const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   const classes = useStyles();
-
-
-
   const [channels, setChannels] = useState([]);
   const [headerOptions, showHeaderOptions] = useState(false);
 
   useEffect(() => {
-
-    const gatherChannelData = async () => {
-      const snapshot = await db
-        .collection("channels")
-        .where("serverId", "==", selectedServer.id)
-        .get();
-      return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-    };
-
     const fetchChannels = async () => {
       if (selectedServer.id) {
-        const channels = await gatherChannelData();
+        const channels = await channelService.getChannels(selectedServer.id);
         setChannels(channels);
       }
     };
     fetchChannels();
   }, [selectedServer.id]);
 
-  const getChannels = async () => {
-    const snapshot = await db
-      .collection("channels")
-      .where("serverId", "==", selectedServer.id)
-      .get();
-    return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-  };
-
-  const addChannel = async () => {
-    const name = prompt("What do you want you your channel to be named?");
-    await db.collection("channels").add({
-      serverId: selectedServer.id,
-      name: name,
-      timestamp: new Date(),
-      messages: [],
-      voice: true,
-    });
-    const channels = await getChannels();
+  const handleAddChannel = async () => {
+    await channelService.addChannel(selectedServer.id);
+    const channels = await channelService.getChannels(selectedServer.id);
     setChannels(channels);
     toggleHeaderOptions();
   };
@@ -174,7 +148,10 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
           </Paper>
         </Paper>
       </div>
-      <HeaderOptions addChannel={addChannel} headerOptions={headerOptions} />
+      <HeaderOptions
+        handleAddChannel={handleAddChannel}
+        headerOptions={headerOptions}
+      />
     </Drawer>
   );
 };

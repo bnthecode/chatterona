@@ -1,23 +1,19 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-// import Modal from '@material-ui/core/Modal';
+import Modal from '@material-ui/core/Modal';
 import AddIcon from '@material-ui/icons/Add';
-// import { FormControl, InputLabel, Input, Button, Grid } from '@material-ui/core';
+import { FormControl, InputLabel, Input, Button, Grid } from '@material-ui/core';
 
-// function rand() {
-//     return Math.round(Math.random() * 20) - 10;
-// }
+function getModalStyle() {
+    const top = 50
+    const left = 50
 
-// function getModalStyle() {
-//     const top = 50
-//     const left = 50
-
-//     return {
-//         top: `${top}%`,
-//         left: `${left}%`,
-//         transform: `translate(-${top}%, -${left}%)`,
-//     };
-// }
+    return {
+        top: `${top}%`,
+        left: `${left}%`,
+        transform: `translate(-${top}%, -${left}%)`,
+    };
+}
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -49,50 +45,56 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ServerModal({ addServer }) {
+export default function ServerModal({ handleAddServer }) {
     const classes = useStyles();
-    // const [modalStyle] = React.useState(getModalStyle);
-    // const [open, setOpen] = React.useState(false);
+    const [modalStyle] = React.useState(getModalStyle);
+    const [open, setOpen] = React.useState(false);
+    const [input, setInput] = React.useState('')
 
-    // const handleOpen = () => {
-    //     setOpen(true);
-    // };
+    const handleOpen = () => {
+        setOpen(true);
+    };
 
-    // const handleClose = () => {
-    //     setOpen(false);
-    // };
+    const handleClose = () => {
+        setOpen(false);
+    };
 
-    // const body = (
-    //     <>
-    //         <div style={modalStyle} className={classes.paper}>
-    //             <Grid container>
-    //                 <Grid item sm={8}>
-    //                     <FormControl>
-    //                         <InputLabel htmlFor="my-input">Enter Server Name:</InputLabel>
-    //                         <Input id="my-input" aria-describedby="my-helper-text" />
-    //                     </FormControl>
-    //                 </Grid>
-    //                 <Grid item sm={4}>
-    //                     <Button className={classes.btn}>Add Server</Button>
-    //                 </Grid>
-    //             </Grid>
-    //         </div>
-    //     </>
-    // );
+    const handleInput = (e) => {
+        const input = e.target.value
+        setInput(input)
+    }
+
+    const body = (
+        <>
+            <div style={modalStyle} className={classes.paper}>
+                <Grid container>
+                    <Grid item sm={8}>
+                        <FormControl>
+                            <InputLabel style={{color: 'white'}} htmlFor="my-input">Enter Server Name:</InputLabel>
+                            <Input onChange={handleInput} id="my-input" aria-describedby="my-helper-text" />
+                        </FormControl>
+                    </Grid>
+                    <Grid item sm={4}>
+                        <Button onClick={() => {handleAddServer(input); handleClose()}} className={classes.btn}>Add Server</Button>
+                    </Grid>
+                </Grid>
+            </div>
+        </>
+    );
 
     return (
         <div>
-            <div className={classes.btn} onClick={addServer}>
+            <div className={classes.btn} onClick={handleOpen}>
                 <AddIcon/>
             </div>
-            {/* <Modal
+            <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="simple-modal-title"
                 aria-describedby="simple-modal-description"
             >
                 {body}
-            </Modal> */}
+            </Modal>
         </div>
     );
 }

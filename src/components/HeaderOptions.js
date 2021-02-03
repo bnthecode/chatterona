@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 6,
   },
 }));
-const HeaderOptions = ({ headerOptions, addChannel }) => {
+const HeaderOptions = ({ headerOptions, inviteFriends, handleAddChannel }) => {
   const classes = useStyles();
   return (
     <Grow in={headerOptions}>
@@ -36,7 +36,7 @@ const HeaderOptions = ({ headerOptions, addChannel }) => {
       >
         <List>
           <ListItem
-            onClick={addChannel}
+            onClick={handleAddChannel}
             className={classes.headerItem}
             dense
             button
@@ -45,6 +45,21 @@ const HeaderOptions = ({ headerOptions, addChannel }) => {
               primary={
                 <Typography style={{ fontSize: 12, fontWeight: 600 }}>
                   Add a channel
+                </Typography>
+              }
+            ></ListItemText>
+            <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+          </ListItem>
+          <ListItem
+            onClick={inviteFriends}
+            className={classes.headerItem}
+            dense
+            button
+          >
+            <ListItemText
+              primary={
+                <Typography style={{ fontSize: 12, fontWeight: 600 }}>
+                  Invite friends
                 </Typography>
               }
             ></ListItemText>
