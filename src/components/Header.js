@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import { connect } from "react-redux";
-import { Divider, Typography, Grid } from "@material-ui/core";
+import { Divider, Typography } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHashtag, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
 import { truncateString } from "../utilities";

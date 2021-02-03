@@ -4,15 +4,12 @@ import {
   Typography,
   Grid,
   Divider,
-  Button,
   List,
   ListItem,
   ListItemText,
-  ListItemAvatar,
   Paper,
   makeStyles,
 } from "@material-ui/core";
-import { ArrowDropDown, ExpandMore, ViewHeadline } from "@material-ui/icons";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import db from "../firebase";
@@ -38,6 +35,31 @@ const useStyles = makeStyles((theme) => ({
 
 const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   const classes = useStyles();
+
+
+
+  const [channels, setChannels] = useState([]);
+  const [headerOptions, showHeaderOptions] = useState(false);
+
+  useEffect(() => {
+
+    const gatherChannelData = async () => {
+      const snapshot = await db
+        .collection("channels")
+        .where("serverId", "==", selectedServer.id)
+        .get();
+      return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+    };
+
+    const fetchChannels = async () => {
+      if (selectedServer.id) {
+        const channels = await gatherChannelData();
+        setChannels(channels);
+      }
+    };
+    fetchChannels();
+  }, [selectedServer.id]);
+
   const getChannels = async () => {
     const snapshot = await db
       .collection("channels")
@@ -46,16 +68,6 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
     return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
   };
 
-  const [channels, setChannels] = useState([]);
-  const [headerOptions, showHeaderOptions] = useState(false);
-
-  useEffect(async () => {
-    if (selectedServer.id) {
-      const channels = await getChannels();
-      setChannels(channels);
-    }
-  }, [selectedServer.id]);
-
   const addChannel = async () => {
     const name = prompt("What do you want you your channel to be named?");
     await db.collection("channels").add({
@@ -63,11 +75,11 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
       name: name,
       timestamp: new Date(),
       messages: [],
-      voice: true
+      voice: true,
     });
     const channels = await getChannels();
     setChannels(channels);
-    toggleHeaderOptions()
+    toggleHeaderOptions();
   };
 
   const toggleHeaderOptions = () => showHeaderOptions(!headerOptions);
@@ -75,7 +87,10 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   return (
     <Drawer width="360px" style={{ backgroundColor: "#3b3b3b" }}>
       <div style={{ paddingLeft: "86px" }}>
-        <ChannelHeader serverName={selectedServer.name} toggleHeaderOptions={toggleHeaderOptions} />
+        <ChannelHeader
+          serverName={selectedServer.name}
+          toggleHeaderOptions={toggleHeaderOptions}
+        />
         <Divider
           style={{ width: "100%", height: 1, backgroundColor: "#1e1e1e" }}
         />
@@ -118,9 +133,7 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
           <Paper
             style={{
               backgroundImage: `url(${user.photoURL})`,
-              height: 40,
               position: "relative",
-              width: 40,
               minHeight: 40,
               borderRadius: 20,
               backgroundSize: "contain",
@@ -161,14 +174,14 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
           </Paper>
         </Paper>
       </div>
-      <HeaderOptions addChannel={addChannel} headerOptions={headerOptions}/>
+      <HeaderOptions addChannel={addChannel} headerOptions={headerOptions} />
     </Drawer>
   );
 };
 
 const mapDispatchToProps = (dispatch) => ({
-  setChannel: dispatch(setChannelRedux)
-})
+  setChannel: dispatch(setChannelRedux),
+});
 
 const mapStateToProps = (state) => ({
   selectedServer: state.app.selectedServer,
