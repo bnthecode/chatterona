@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Channels = ({ selectedServer, setChannel, user }) => {
+const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   const classes = useStyles();
   const getChannels = async () => {
     const snapshot = await db
@@ -85,6 +85,7 @@ const Channels = ({ selectedServer, setChannel, user }) => {
               <ListItem
                 onClick={() => setChannel(chnl)}
                 className={classes.channelItem}
+                selected={chnl.id === selectedChannel.id}
                 disableRipple={true}
                 dense
                 button
@@ -171,6 +172,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const mapStateToProps = (state) => ({
   selectedServer: state.app.selectedServer,
+  selectedChannel: state.app.selectedChannel,
   user: state.auth.user,
 });
 

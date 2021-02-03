@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ServerModal() {
+export default function ServerModal({ addServer }) {
     const classes = useStyles();
     const [modalStyle] = React.useState(getModalStyle);
     const [open, setOpen] = React.useState(false);
@@ -82,17 +82,17 @@ export default function ServerModal() {
 
     return (
         <div>
-            <div className={classes.btn} onClick={handleOpen}>
+            <div className={classes.btn} onClick={addServer}>
                 <AddIcon/>
             </div>
-            <Modal
+            {/* <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="simple-modal-title"
                 aria-describedby="simple-modal-description"
             >
                 {body}
-            </Modal>
+            </Modal> */}
         </div>
     );
 }
