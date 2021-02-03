@@ -2,11 +2,14 @@ import { auth } from "../firebase";
 
 const userService = {
   updateUser: async (modifiedFields, uid) => {
-    auth
-      .updateUser(uid, {
+    try {
+      await auth.updateUser(uid, {
         ...modifiedFields,
-      })
-  }
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  },
 };
 
 export default userService;
