@@ -1,10 +1,6 @@
 import {
-  FormControl,
   InputLabel,
-  Input,
   Button,
-  Grid,
-  Dialog,
   DialogTitle,
   Typography,
   makeStyles,
@@ -12,20 +8,15 @@ import {
   TextField,
 } from "@material-ui/core";
 import {
-  faUserFriends,
-  faUsers,
-  faChevronRight,
   faCamera,
 } from "@fortawesome/free-solid-svg-icons";
-import clsx from "clsx";
-import DialogItem from "../DialogItem";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 
 const useStyles = makeStyles((theme) => ({
   title: {
     fontSize: 20,
-    fontWeight: 800,
+    fontWeight: 700,
   },
   subtitle: {
     marginTop: 8,
@@ -49,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 20,
   },
   footerButton: {
-    backgroundColor: "red",
     marginLeft: "auto",
     height: 40,
     width: 100,
@@ -82,13 +72,13 @@ const useStyles = makeStyles((theme) => ({
     fontSize: 30,
   },
   uploadText: {
-    fontWeight: 800,
+    fontWeight: 700,
     color: "grey",
     fontSize: 12,
   },
   label: {
     fontSize: 12,
-    fontWeight: 800,
+    fontWeight: 700,
     alignSelf: "flex-start",
   },
   input: {

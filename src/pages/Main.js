@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { connect } from "react-redux";
 import Channels from "../components/Channels";
+import ChannelUsers from "../components/ChannelUsers";
 import Chat from "../components/Chat";
 import Header from "../components/Header";
 import Servers from "../components/Servers";
@@ -32,6 +33,7 @@ class Main extends Component {
           user={user}
         />
         {id ? <Chat selectedChannel={selectedChannel} user={user} /> : ""}
+        {id ? <ChannelUsers /> : ""}
       </>
     );
   }

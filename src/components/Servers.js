@@ -32,8 +32,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     width: "72px",
     alignItems: "center",
-    borderRight: "1px solid #1e1e1e",
-    backgroundColor: "#1e1e1e",
+    backgroundColor: "#202225",
   },
   divider: {
     backgroundColor: "#1e1e1e",
@@ -75,7 +74,7 @@ const Servers = ({ setServer, setChannel, user }) => {
 
   const classes = useStyles();
   return (
-    <Drawer className={classes.drawer}>
+    <Drawer anchor="left" className={classes.drawer}>
       <ServerListItem
         title="Home"
         id="Home"
@@ -109,8 +108,9 @@ const Servers = ({ setServer, setChannel, user }) => {
         <AddIcon />
       </ServerListItem>
       <AddServerDialog
-        open={showAddServerDialog}
+        showAddServerDialog={showAddServerDialog}
         handleAddServer={handleAddServer}
+        setAddServerDialogOpen={setAddServerDialogOpen}
       />
     </Drawer>
   );

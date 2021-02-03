@@ -1,23 +1,15 @@
 import {
-  FormControl,
-  InputLabel,
-  Input,
-  Button,
-  Grid,
-  Dialog,
   DialogTitle,
   Typography,
   makeStyles,
 } from "@material-ui/core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faCrown } from "@fortawesome/free-solid-svg-icons";
-import clsx from "clsx";
 import DialogItem from "../DialogItem";
 
 const useStyles = makeStyles((theme) => ({
   title: {
     fontSize: 20,
-    fontWeight: 800,
+    fontWeight: 700,
   },
   subtitle: {
     marginTop: 8,

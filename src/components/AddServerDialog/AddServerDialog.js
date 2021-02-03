@@ -1,95 +1,51 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import {
-
-  Dialog,
-
-} from "@material-ui/core";
+import { Dialog } from "@material-ui/core";
 
 import PageOne from "./pages/PageOne";
 import PageTwo from "./pages/PageTwo";
 import PageThree from "./pages/PageThree";
 import Stepper from "../Stepper";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 const useStyles = makeStyles((theme) => ({
   paper: {
-    position: "absolute",
+    position: "relative",
     textAlign: "center",
     width: 400,
     height: 500,
     backgroundColor: "#eee",
-    border: "2px solid #000",
-    boxShadow: theme.shadows[5],
-    padding: theme.spacing(1, 4, 3),
-    top: "calc(50% - 280px)",
-    left: "calc(50% - 200px)",
+    padding: 18,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 800,
-  },
-  subtitle: {
-    marginTop: 8,
-    color: "grey",
-  },
-  dialogItem: {
-    textTransform: "none",
-    display: "flex",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    padding: 16,
-  },
-  dialogItemIcon: {
-    color: theme.palette.secondary.dark,
+  closeBtn: {
+    position: "absolute",
+    top: 8,
+    right: 12,
     fontSize: 24,
-  },
-  flexItemRight: {
-    marginRight: 'auto'
-  },
-  flexItemLeft: {
-    marginLeft: 'auto'
-  },
-  dialogItemText: {
-    fontSize: 18,
-    fontWeight: 600,
-    
+    cursor: "pointer",
   },
 }));
 
-
-
-const AddServerDialog = ({ open, handleAddServer }) => {
+const AddServerDialog = ({
+  showAddServerDialog,
+  handleAddServer,
+  setAddServerDialogOpen,
+}) => {
   const classes = useStyles();
-  const [serverName, setServerName] = React.useState("");
   const componentList = [PageOne, PageTwo, PageThree];
   return (
     <Dialog
       PaperProps={{
         className: classes.paper,
       }}
-      open={open}
+      open={showAddServerDialog}
     >
-     <Stepper onComplete={handleAddServer} componentList={componentList} />
-
-      {/* <FormControl>
-        <InputLabel style={{ color: "white" }} htmlFor="my-input">
-          Enter Server Name:
-        </InputLabel>
-        <Input
-          onChange={({
-            e: {
-              target: { value },
-            },
-          }) => setServerName(value)}
-          id="my-input"
-        />
-      </FormControl> */}
-
-      {/* <Button
-              onClick={() => handleAddServer(serverName)}
-              className={classes.btn}
-            >
-              Add Server
-            </Button> */}
+      <FontAwesomeIcon
+        onClick={() => setAddServerDialogOpen(false)}
+        className={classes.closeBtn}
+        icon={faTimes}
+      ></FontAwesomeIcon>
+      <Stepper onComplete={handleAddServer} componentList={componentList} />
     </Dialog>
   );
 };

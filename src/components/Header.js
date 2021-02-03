@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   headerText: {
     color: "white",
     fontSize: 14,
-    fontWeight: 800,
+    fontWeight: 700,
   },
   headerIcon: {
     marginRight: 10,
@@ -80,7 +80,7 @@ const Header = ({ selectedChannel }) => {
 
   return (
     <div className={classes.root}>
-      <AppBar className={classes.appbar} position="static">
+      <AppBar elevation={2} className={classes.appbar} position="static">
         <Toolbar>{renderSelectedChannel()}</Toolbar>
       </AppBar>
     </div>

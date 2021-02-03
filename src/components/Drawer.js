@@ -18,7 +18,7 @@ const Drawer = ({ width, variant, anchor, children, ...rest }) => {
                 className: classes.drawerWrapper,
                 ...rest,
             }}
-            anchor="left"
+            anchor={anchor}
             variant="persistent"
         >
             {children}

@@ -1,42 +1,18 @@
-import { faHashtag, faVolumeUp } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Typography,
   Grid,
   Divider,
   List,
-  ListItem,
-  ListItemText,
   Paper,
-  makeStyles
 } from "@material-ui/core";
 import { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import db from "../firebase";
-import { setChannelRedux } from "../redux/actions/appActions";
 import { channelService } from "../services";
-import { truncateString } from "../utilities";
 import ChannelHeader from "./ChannelHeader";
 import ChannelListItem from "./ChannelListItem";
 import Drawer from "./Drawer";
 import HeaderOptions from "./HeaderOptions";
 
-const useStyles = makeStyles((theme) => ({
-  channelItem: {
-    color: "white",
-    width: "100%",
-    "&:hover": {
-      backgroundColor: "#4f4f4f",
-    },
-    "&:focus": {
-      backgroundColor: "#4f4f4f",
-    },
-    borderRadius: 6,
-  },
-}));
-
 const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
-  const classes = useStyles();
   const [channels, setChannels] = useState([]);
   const [headerOptions, showHeaderOptions] = useState(false);
 
@@ -60,7 +36,7 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   const toggleHeaderOptions = () => showHeaderOptions(!headerOptions);
 
   return (
-    <Drawer width="310px" style={{ backgroundColor: "#3b3b3b" }}>
+    <Drawer anchor="left" width="310px" style={{ backgroundColor: "#23272a" }}>
       <div style={{ paddingLeft: "72px" }}>
         <ChannelHeader
           serverName={selectedServer.name}
@@ -125,7 +101,7 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
                 left: 60,
                 fontSize: 12,
                 color: "white",
-                fontWeight: 800,
+                fontWeight: 700,
               }}
             >
               <span style={{ whiteSpace: "nowrap" }}>{user.displayName}</span>

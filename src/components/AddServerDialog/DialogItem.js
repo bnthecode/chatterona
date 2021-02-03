@@ -1,16 +1,9 @@
 import {
-  FormControl,
-  InputLabel,
-  Input,
   Button,
-  Grid,
-  Dialog,
-  DialogTitle,
   Typography,
   makeStyles,
 } from "@material-ui/core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faCrown } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({

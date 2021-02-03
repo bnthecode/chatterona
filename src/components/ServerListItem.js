@@ -18,11 +18,8 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       transition: "all .5s",
       color: "white",
-      borderRadius: "40%",
+      borderRadius: "35%",
     },
-  },
-  selectedItem: {
-    border: "1px solid white",
   },
 }));
 
@@ -35,13 +32,16 @@ const ServerListItem = ({
   children,
 }) => {
   const classes = useStyles();
+  const getSelectedStyles = () => {
+    return selected ? {  borderLeft: '3px solid white', marginLeft: '-3px' } : { }
+  }
   return (
     <div onClick={() => setSelected(id)}>
+      <div style={getSelectedStyles()}>
       <Tooltip placement="right" title={title}>
         <Paper
         onClick={() => setSelected(id)}
           className={clsx([
-            selected ? classes.selectedItem : null,
             classes.serverListItem,
           ])}
           {...listItemProps}
@@ -49,6 +49,7 @@ const ServerListItem = ({
           {children}
         </Paper>
       </Tooltip>
+      </div>
     </div>
   );
 };
