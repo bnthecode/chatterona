@@ -17,7 +17,29 @@ const styles = (theme) => ({
     "*::-webkit-scrollbar-thumb": {
       display: "none",
     },
+    /* width */
+'::-webkit-scrollbar': {
+  display: "none",
+},
+
+/* Track */
+'::-webkit-scrollbar-track': {
+  display: "none",
+},
+
+/* Handle */
+'::-webkit-scrollbar-thumb': {
+  display: "none",
+},
+
+/* Handle on hover */
+'::-webkit-scrollbar-thumb:hover': {
+  display: "none",
+},
   },
+  input: {
+    height: 34,
+  }
 });
 
 class Chat extends React.Component {
@@ -182,6 +204,7 @@ class Chat extends React.Component {
         >
           <Grid item md={11}>
             <TextField
+              InputProps={{classes: {root: classes.input}}}
               variant='outlined'
               onKeyPress={this.submitMessage}
               onChange={this.handleTyping}

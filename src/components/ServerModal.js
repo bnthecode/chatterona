@@ -82,9 +82,9 @@ export default function ServerModal() {
 
     return (
         <div>
-            <button type="button" className={classes.btn} onClick={handleOpen}>
-                <AddIcon />
-            </button>
+            <div className={classes.btn} onClick={handleOpen}>
+                <AddIcon/>
+            </div>
             <Modal
                 open={open}
                 onClose={handleClose}

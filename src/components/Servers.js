@@ -95,9 +95,6 @@ const Servers = ({ setServer, setChannel, serverId, user }) => {
           </Paper>
           </Tooltip>
       ))}
-      <div className={classes.btn}>
-        <AddIcon onClick={addServer} />
-      </div>
       <ServerModal addServer ={addServer} />
     </Drawer>
   );
