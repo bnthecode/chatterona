@@ -1,7 +1,10 @@
+import { faCommentDots } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Typography } from "@material-ui/core";
 import { connect } from "react-redux";
 import { auth, provider } from "../firebase";
 import { logInUserRedux } from "../redux/actions/authActions";
+import GoogleLogo from '../images/google-logo.svg';
 
 const Login = ({ handleLogin }) => {
 
@@ -18,16 +21,17 @@ const Login = ({ handleLogin }) => {
        color: 'white'}}>
       <Typography style={{ fontFamily: 'monospace', transform: 'rotate(-8deg)', fontSize: 92, marginBottom: 100, height: '50%', }} >
         
-         Chatteroni
-         <div style={{width: 16, height: 16, borderRadius: 8, transform: 'rotate(-8deg)',
-          position: 'absolute', top: 34, right: 62, backgroundColor: '#3d1059'}}></div>
+         Chatterona
+         <FontAwesomeIcon icon={faCommentDots} style={{width: 60, height: 60, borderRadius: 8, transform: 'rotate(-8deg)',
+          position: 'absolute', top: 100, right: 0, color: '#3d1059'}}></FontAwesomeIcon>
          </Typography>
          <Button
-        style={{ width: 300, backgroundColor: '#3d1059',  color: 'white', fontWeight: 600 }}
+        style={{  width: 300, backgroundColor: '#3d1059',  color: 'white',height: 48, fontWeight: 600 }}
         onClick={login}
       >
-        {" "}
+    <img style={{ marginRight: 16, height: 24, width: 24}} src={GoogleLogo} alt="React Logo" />
         Log in
+    
       </Button>
          </div>
   
