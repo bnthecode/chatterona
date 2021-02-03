@@ -62,6 +62,7 @@ const Channels = ({ selectedServer, setChannel, user }) => {
       serverId: selectedServer.id,
       name: name,
       timestamp: new Date(),
+      messages: [],
       voice: true
     });
     const channels = await getChannels();

@@ -29,15 +29,18 @@ class Chat extends React.Component {
     messages: [],
   };
 
-  componentDidMount = () => {
+  componentDidUpdate = (prevProps) => {
     const { selectedChannel } = this.props;
-    db.collection("channels")
-      .doc(selectedChannel.id)
-      .onSnapshot((doc) => {
-        const { messages } = doc.data();
-        console.log(messages);
-        this.updateMessages(messages);
-      });
+    if (prevProps.selectedChannel.id !== this.props.selectedChannel.id) {
+      db.collection("channels")
+        .doc(selectedChannel.id)
+        .onSnapshot((doc) => {
+          const { messages } = doc.data();
+          console.log(messages);
+          this.updateMessages(messages);
+          this.messageRef.current.scrollIntoView({ behavior: 'smooth'})
+        });
+    }
   };
 
   updateMessages = (messages) => this.setState({ messages });
@@ -46,11 +49,14 @@ class Chat extends React.Component {
     const { selectedChannel, user } = this.props;
     const content = prompt("What would you like to say?");
     const dbRef = db.collection("channels").doc(selectedChannel.id);
-    const newMsg = { when: new Date(), content, author: { photoURL: user.photoURL } };
+    const newMsg = {
+      when: new Date(),
+      content,
+      author: { photoURL: user.photoURL },
+    };
     dbRef.update({
-      messages: firestore.FieldValue.arrayUnion(newMsg)
-    })
-  
+      messages: firestore.FieldValue.arrayUnion(newMsg),
+    });
   };
 
   render() {
