@@ -7,14 +7,17 @@ import { logInUserRedux } from "../redux/actions/authActions";
 import GoogleLogo from "../images/google-logo.svg";
 
 const Login = ({ logInUser, history }) => {
+
+  
+
   const login = () => {
     auth
       .signInWithPopup(provider)
       .then((user) => {
         logInUser(user);
-        history.push('/');
+        history.push("/");
       })
-      .catch(() => logInUser(null));
+      .catch(() => console.log("yoooo"));
   };
 
   return (
@@ -59,7 +62,7 @@ const Login = ({ logInUser, history }) => {
           height: 48,
           fontWeight: 600,
         }}
-        onClick={login}
+        onClick={() => login()}
       >
         <img
           style={{ marginRight: 16, height: 24, width: 24 }}

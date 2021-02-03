@@ -5,11 +5,10 @@ import {
 } from "react-router-dom";
 import Login from "../pages/Login";
 import Main from "../pages/Main";
-import { auth as firebaseAuth } from "../firebase";
 import history from "../redux/history";
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
-  const isLoggedIn = firebaseAuth.currentUser;
+const PrivateRoute = ({ component: Component, user, ...rest }) => {
+  const isLoggedIn = user && user.uid;
   return (
     <Route
       {...rest}
@@ -20,10 +19,10 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
   );
 };
 
-const AppRouter = () => {
+const AppRouter = ({ user }) => {
   return (
     <Router history={history}>
-        <PrivateRoute exact path="/" component={Main} />
+        <PrivateRoute exact path="/" user={user} component={Main} />
         <Route exact path="/login" component={Login} />
     </Router>
   );
