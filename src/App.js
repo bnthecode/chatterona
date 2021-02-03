@@ -1,11 +1,10 @@
 import { Button } from "@material-ui/core";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { connect } from "react-redux";
-import Drawer from "./components/Drawer";
 import Channels from "./components/Channels";
 import Servers from "./components/Servers";
 import Header from "./components/Header";
-import db, { auth as firebaseAuth, provider } from "./firebase";
+import  { auth as firebaseAuth } from "./firebase";
 import Login from "./pages/Login";
 import { logInUserRedux } from "./redux/actions/authActions";
 import Chat from "./components/Chat";

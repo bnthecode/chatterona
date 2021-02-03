@@ -43,7 +43,6 @@ const ChannelHeader = ({ serverName, toggleHeaderOptions }) => {
       <FontAwesomeIcon
         icon={faChevronDown}
         style={{
-          fontSize: 12,
           position: "absolute",
           top: "calc(50% - 8px)",
           right: 18,

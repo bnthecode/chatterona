@@ -7,8 +7,6 @@ import { MuiThemeProvider } from "@material-ui/core";
 import theme from "./styles/muiTheme";
 import { Provider } from "react-redux";
 import { store, persistor } from "./redux/store";
-import { ConnectedRouter } from "connected-react-router";
-import history from "./redux/history";
 import { PersistGate } from "redux-persist/integration/react";
 
 

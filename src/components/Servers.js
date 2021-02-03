@@ -1,16 +1,12 @@
 import {
-  Avatar,
-  Button,
   Divider,
   makeStyles,
-  Typography,
   Paper,
   Tooltip
 } from "@material-ui/core";
 import Drawer from "./Drawer";
 import ServerModal from './ServerModal'
 import VideogameAssetIcon from "@material-ui/icons/VideogameAsset";
-import AddIcon from "@material-ui/icons/Add";
 import db from "../firebase";
 import { useEffect, useState } from "react";
 import { setChannelRedux, setServerRedux } from "../redux/actions/appActions";
@@ -40,9 +36,12 @@ const useStyles = makeStyles((theme) => ({
 const Servers = ({ setServer, setChannel, serverId, user }) => {
   const [servers, setServers] = useState([]);
 
-  useEffect(async () => {
-    const servers = await getServers();
-    setServers(servers);
+  useEffect(() => {
+    const fetchServers = async () => {
+      const servers = await getServers();
+      setServers(servers);
+    }
+    fetchServers();
   }, []);
 
   const getServers = async () => {

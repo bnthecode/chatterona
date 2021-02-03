@@ -1,12 +1,9 @@
 import {
-  Button,
-  Input,
   Paper,
   TextField,
   Typography,
   Grid,
 } from "@material-ui/core";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { withStyles } from "@material-ui/styles";
 import React from "react";
 import { connect } from "react-redux";
