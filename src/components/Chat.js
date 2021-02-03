@@ -10,7 +10,7 @@ import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { withStyles } from "@material-ui/styles";
 import React from "react";
 import { connect } from "react-redux";
-import db from "../firebase";
+import db, { firestore } from "../firebase";
 
 const styles = (theme) => ({
   "@global": {
@@ -35,25 +35,22 @@ class Chat extends React.Component {
       .doc(selectedChannel.id)
       .onSnapshot((doc) => {
         const { messages } = doc.data();
-        console.log(messages)
+        console.log(messages);
         this.updateMessages(messages);
       });
   };
 
-  updateMessages = (messages) =>  this.setState({ messages });
+  updateMessages = (messages) => this.setState({ messages });
 
   addMessageToChannel = async () => {
     const { selectedChannel, user } = this.props;
     const content = prompt("What would you like to say?");
-    await db
-      .collection("channels")
-      .doc(selectedChannel.id)
-      .update(
-        {
-          messages: { when: new Date(), content, author: { photoURL: user.photoURL } },
-        
-        }
-      );
+    const dbRef = db.collection("channels").doc(selectedChannel.id);
+    const newMsg = { when: new Date(), content, author: { photoURL: user.photoURL } };
+    dbRef.update({
+      messages: firestore.FieldValue.arrayUnion(newMsg)
+    })
+  
   };
 
   render() {
@@ -76,7 +73,7 @@ class Chat extends React.Component {
             overflow: "auto",
           }}
         >
-          {messages.length ? (
+          {messages && messages.length ? (
             messages.map((msg, i) => (
               <Paper
                 ref={i === messages.length - 1 ? this.messageRef : null}
@@ -93,7 +90,9 @@ class Chat extends React.Component {
               >
                 <Paper
                   style={{
-                    backgroundImage: `url(${msg.author ? msg.author.photoURL : ''})`,
+                    backgroundImage: `url(${
+                      msg.author ? msg.author.photoURL : ""
+                    })`,
                     borderRadius: 20,
                     backgroundSize: "contain",
                     height: 40,

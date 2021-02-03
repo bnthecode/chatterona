@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const Servers = ({ setServer, setChannel, serverId }) => {
+const Servers = ({ setServer, setChannel, serverId, user }) => {
   const [servers, setServers] = useState([]);
 
   useEffect(async () => {
@@ -55,7 +55,7 @@ const Servers = ({ setServer, setChannel, serverId }) => {
     const serverName = prompt("Enter a name");
     await db.collection("servers").add({
       name: serverName,
-      imgUrl: 'https://images.unsplash.com/photo-1493612276216-ee3925520721?ixid=MXwxMjA3fDB8MHxzZWFyY2h8M3x8cmFuZG9tfGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+      imgUrl: user.photoURL,
       country: "USA",
       timestamp: new Date()
     });
@@ -104,6 +104,7 @@ const Servers = ({ setServer, setChannel, serverId }) => {
 };
 
 const mapStateToProps = (state) => ({
+  user: state.auth.user,
     serverId: state.app.serverId
 })
 
