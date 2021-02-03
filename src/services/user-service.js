@@ -1,15 +1,12 @@
-import db from "../firebase";
+import { auth } from "../firebase";
 
 const userService = {
-  addUser: async (user) => {
-    await db.collection("servers").add({
-      name: serverName,
-      imgUrl: user.photoURL,
-      country: "USA",
-      timestamp: new Date(),
-    });
-  },
+  updateUser: async (modifiedFields, uid) => {
+    auth
+      .updateUser(uid, {
+        ...modifiedFields,
+      })
+  }
 };
-
 
 export default userService;

@@ -8,7 +8,7 @@ const serverService = {
   },
 
   addServer: async (serverName, user) => {
-    await db.collection("servers").add({
+    return db.collection("servers").add({
       name: serverName,
       imgUrl: user.photoURL,
       country: "USA",

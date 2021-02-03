@@ -41,8 +41,9 @@ const Servers = ({ setServer, setChannel, serverId, user }) => {
   }, []);
 
   const handleAddServer = async (serverName) => {
-    await serverService.addServer(serverName, user);
-    const serverList = await  serverService.getServers();
+    const newServer = await serverService.addServer(serverName, user);
+    console.log(newServer.id)
+    const serverList = await serverService.getServers();
     setServers(serverList)
   }
 
