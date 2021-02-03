@@ -52,21 +52,29 @@ class Chat extends React.Component {
     input: ""
   };
 
+  componentDidMount = () => {
+    const { selectedChannel } = this.props;
+    this.registerChannelListener(selectedChannel.id)
+  };
+
   componentDidUpdate = (prevProps) => {
     const { selectedChannel } = this.props;
     if (prevProps.selectedChannel.id !== this.props.selectedChannel.id) {
-      db.collection("channels")
-        .doc(selectedChannel.id)
-        .onSnapshot((doc) => {
-          const { messages } = doc.data();
-          console.log(messages);
-          this.updateMessages(messages);
-          if (this.messageRef && this.messageRef.current) {
-            this.messageRef.current.scrollIntoView({ behavior: 'smooth' })
-          }
-        });
+      this.registerChannelListener(selectedChannel.id)
     }
   };
+
+  registerChannelListener = (channelId) => {
+    db.collection("channels")
+    .doc(channelId)
+    .onSnapshot((doc) => {
+      const { messages } = doc.data();
+      this.updateMessages(messages);
+      if (this.messageRef && this.messageRef.current) {
+        this.messageRef.current.scrollIntoView({ behavior: 'smooth' })
+      }
+    });
+  }
 
   updateMessages = (messages) => this.setState({ messages });
 
