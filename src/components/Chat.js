@@ -2,6 +2,7 @@ import { Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import React from "react";
 import db, { firestore } from "../firebase";
+import channelService from "../services/channel-service";
 
 const styles = () => ({
   "@global": {
@@ -45,6 +46,13 @@ const styles = () => ({
     bottom: 0,
     borderRadius: 8,
   },
+  userTypings: {
+    width: 400,
+    position: "absolute",
+    bottom: 60,
+    borderRadius: 8,
+    color: "white",
+  },
 });
 
 class Chat extends React.Component {
@@ -54,6 +62,7 @@ class Chat extends React.Component {
   }
   state = {
     messages: [],
+    usersTyping: [],
     input: "",
   };
 
@@ -62,7 +71,7 @@ class Chat extends React.Component {
     this.registerChannelListener(selectedChannel.id);
   };
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = (prevProps, prevState) => {
     const { selectedChannel } = this.props;
     if (prevProps.selectedChannel.id !== selectedChannel.id) {
       this.registerChannelListener(selectedChannel.id);
@@ -73,7 +82,8 @@ class Chat extends React.Component {
     db.collection("channels")
       .doc(channelId)
       .onSnapshot((doc) => {
-        const { messages } = doc.data();
+        const { messages, usersTyping } = doc.data();
+        this.setState({ usersTyping });
         this.updateMessages(messages);
         if (this.messageRef && this.messageRef.current) {
           this.messageRef.current.scrollIntoView({ behavior: "smooth" });
@@ -84,6 +94,7 @@ class Chat extends React.Component {
   updateMessages = (messages) => this.setState({ messages });
 
   addMessageToChannel = async () => {
+    this.setState({ userTyping: false });
     const { input } = this.state;
     const { selectedChannel, user } = this.props;
     const dbRef = db.collection("channels").doc(selectedChannel.id);
@@ -99,20 +110,25 @@ class Chat extends React.Component {
   };
 
   handleTyping = (e) => {
+    this.setState({ userTyping: true });
+    const { selectedChannel, user } = this.props;
+    channelService.addUserTyping(selectedChannel.id, user, true);
     let input = e.target.value;
     this.setState({ input: input });
   };
 
   submitMessage = (e) => {
+    const { selectedChannel, user } = this.props;
     if (e.key === "Enter") {
       this.setState({ input: "" });
+      channelService.addUserTyping(selectedChannel.id, user, false);
       return this.addMessageToChannel();
     }
   };
 
   render() {
-    const { messages, input } = this.state;
-    const { classes, selectedChannel } = this.props;
+    const { messages, input, usersTyping } = this.state;
+    const { classes, selectedChannel, user } = this.props;
     return (
       <div
         style={{
@@ -235,6 +251,13 @@ class Chat extends React.Component {
             )}
           </div>
         </div>
+
+        {Object.keys(usersTyping).map((key) => key !== user.uid ? (
+          <Typography className={classes.userTypings}>
+            <span>{`${usersTyping[key]} is typing...`}</span>
+          </Typography>
+        ): '') }
+
         <TextField
           InputProps={{ classes: { input: classes.input2 } }}
           variant="outlined"
