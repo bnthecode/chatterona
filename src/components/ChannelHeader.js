@@ -13,7 +13,7 @@ const ChannelHeader = ({ serverName, toggleHeaderOptions }) => {
       style={{
         cursor: "pointer",
         position: "relative",
-        height: 40,
+        height: 46,
         backgroundColor: "#3b3b3b",
         borderBottom: "1px solid #1e1e1e",
       }}

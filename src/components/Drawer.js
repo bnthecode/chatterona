@@ -1,11 +1,11 @@
 import { Drawer as MuiDrawer, makeStyles } from "@material-ui/core";
 
-const Drawer = ({ width, variant, children, ...rest }) => {
+const Drawer = ({ width, variant, anchor, children, ...rest }) => {
 
     const useStyles = makeStyles((theme) => ({
         drawerWrapper: {
             position: 'absolute',
-            width: width || '20%',
+            width: width,
             height: '100vh',
         },
     }));

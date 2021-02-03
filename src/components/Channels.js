@@ -8,7 +8,7 @@ import {
   ListItem,
   ListItemText,
   Paper,
-  makeStyles,
+  makeStyles
 } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
@@ -17,6 +17,7 @@ import { setChannelRedux } from "../redux/actions/appActions";
 import { channelService } from "../services";
 import { truncateString } from "../utilities";
 import ChannelHeader from "./ChannelHeader";
+import ChannelListItem from "./ChannelListItem";
 import Drawer from "./Drawer";
 import HeaderOptions from "./HeaderOptions";
 
@@ -59,8 +60,8 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   const toggleHeaderOptions = () => showHeaderOptions(!headerOptions);
 
   return (
-    <Drawer width="360px" style={{ backgroundColor: "#3b3b3b" }}>
-      <div style={{ paddingLeft: "86px" }}>
+    <Drawer width="310px" style={{ backgroundColor: "#3b3b3b" }}>
+      <div style={{ paddingLeft: "72px" }}>
         <ChannelHeader
           serverName={selectedServer.name}
           toggleHeaderOptions={toggleHeaderOptions}
@@ -70,29 +71,13 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
         />
         <Grid container>
           <List style={{ width: "100%", margin: 4 }}>
-            {channels.map((chnl) => (
-              <ListItem
-                onClick={() => setChannel(chnl)}
-                className={classes.channelItem}
+            {channels ? channels.map((chnl) => (
+              <ChannelListItem
                 selected={chnl.id === selectedChannel.id}
-                disableRipple={true}
-                dense
-                button
-              >
-                <ListItemText
-                  primary={
-                    <Typography style={{ fontWeight: 600, fontSize: 14 }}>
-                      <FontAwesomeIcon
-                        style={{ marginRight: 8 }}
-                        color="#636363"
-                        icon={chnl.voice ? faVolumeUp : faHashtag}
-                      ></FontAwesomeIcon>
-                      {truncateString(chnl.name, 26)}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
+                setChannel={setChannel}
+                channel={chnl}
+              />
+            )): ''}
           </List>
         </Grid>
         <Paper
@@ -100,8 +85,8 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
             position: "absolute",
             backgroundColor: "#282828",
             bottom: 0,
-            height: 50,
-            width: "calc(100% - 86px)",
+            height: 52,
+            width: "calc(100% - 72px)",
           }}
         >
           <Paper
@@ -156,14 +141,4 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   );
 };
 
-const mapDispatchToProps = (dispatch) => ({
-  setChannel: dispatch(setChannelRedux),
-});
-
-const mapStateToProps = (state) => ({
-  selectedServer: state.app.selectedServer,
-  selectedChannel: state.app.selectedChannel,
-  user: state.auth.user,
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Channels);
+export default Channels;

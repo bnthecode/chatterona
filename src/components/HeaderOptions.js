@@ -19,21 +19,23 @@ const useStyles = makeStyles((theme) => ({
     },
     borderRadius: 6,
   },
+  menu: {
+    position: "absolute",
+    top: 46,
+    left: 92,
+    padding: 6,
+    width: "calc(100% - 110px)",
+    backgroundColor: "#1e1e1e",
+  }, 
+  menuItem: {
+    fontSize: 12, fontWeight: 600
+  }
 }));
 const HeaderOptions = ({ headerOptions, inviteFriends, handleAddChannel }) => {
   const classes = useStyles();
   return (
     <Grow in={headerOptions}>
-      <Paper
-        style={{
-          position: "absolute",
-          top: 46,
-          left: 92,
-          padding: 6,
-          width: "calc(100% - 110px)",
-          backgroundColor: "#1e1e1e",
-        }}
-      >
+      <Paper className={classes.menu}>
         <List>
           <ListItem
             onClick={handleAddChannel}
@@ -43,7 +45,7 @@ const HeaderOptions = ({ headerOptions, inviteFriends, handleAddChannel }) => {
           >
             <ListItemText
               primary={
-                <Typography style={{ fontSize: 12, fontWeight: 600 }}>
+                <Typography className={classes.menuItem}>
                   Add a channel
                 </Typography>
               }
@@ -58,7 +60,7 @@ const HeaderOptions = ({ headerOptions, inviteFriends, handleAddChannel }) => {
           >
             <ListItemText
               primary={
-                <Typography style={{ fontSize: 12, fontWeight: 600 }}>
+                <Typography className={classes.menuItem}>
                   Invite friends
                 </Typography>
               }

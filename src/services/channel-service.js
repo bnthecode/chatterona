@@ -6,7 +6,8 @@ const channelService = {
       .collection("channels")
       .where("serverId", "==", serverId)
       .get();
-    return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+      const channelList = snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }))
+    return channelList || [];
   },
   addChannel: async (serverId) => {
     const name = prompt("What do you want you your channel to be named?");

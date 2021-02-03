@@ -6,7 +6,6 @@ import {
 } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import React from "react";
-import { connect } from "react-redux";
 import db, { firestore } from "../firebase";
 
 const styles = (theme) => ({
@@ -56,7 +55,7 @@ class Chat extends React.Component {
 
   componentDidUpdate = (prevProps) => {
     const { selectedChannel } = this.props;
-    if (prevProps.selectedChannel.id !== this.props.selectedChannel.id) {
+    if (prevProps.selectedChannel.id !== selectedChannel.id) {
       this.registerChannelListener(selectedChannel.id)
     }
   };
@@ -99,7 +98,6 @@ class Chat extends React.Component {
       this.setState({ input: "" })
       return this.addMessageToChannel()
     }
-    
   }
 
   render() {
@@ -228,14 +226,5 @@ class Chat extends React.Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => ({});
 
-const mapStateToProps = (state) => ({
-  user: state.auth.user,
-  selectedChannel: state.app.selectedChannel,
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withStyles(styles)(Chat));
+export default withStyles(styles)(Chat);

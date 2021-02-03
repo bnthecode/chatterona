@@ -8,9 +8,11 @@ import  { auth as firebaseAuth } from "./firebase";
 import Login from "./pages/Login";
 import { logInUserRedux } from "./redux/actions/authActions";
 import Chat from "./components/Chat";
+import AppRouter from "./components/Router";
 
 function App({ auth, logInUser, selectedChannel }) {
   const [isLoggedIn, setLoggedIn] = useState(firebaseAuth.currentUser);
+  
   const handleLogin = (user) => {
     logInUser(user);
     setLoggedIn(true);
@@ -23,24 +25,7 @@ function App({ auth, logInUser, selectedChannel }) {
 
   return (
     <div style={{ backgroundColor: "#4f4f4f", height: "100vh", width: "100%" }}>
-      {isLoggedIn && auth.user ? (
-        <>
-          <Header />
-          <Channels />
-          <Servers />
-          { selectedChannel.id ? <Chat /> : '' }
-          <Button
-           style={{ width: 120, backgroundColor: '#3d1059',  color: 'white', fontWeight: 600,
-           position: "absolute", top: 48, right: 20 }}
-            onClick={logout}
-          >
-            {" "}
-            Log out
-          </Button>
-        </>
-      ) : (
-        <Login handleLogin={handleLogin} />
-      )}
+      <AppRouter />
     </div>
   );
 }
