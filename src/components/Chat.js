@@ -27,6 +27,7 @@ class Chat extends React.Component {
   }
   state = {
     messages: [],
+    input: ""
   };
 
   componentDidUpdate = (prevProps) => {
@@ -38,7 +39,9 @@ class Chat extends React.Component {
           const { messages } = doc.data();
           console.log(messages);
           this.updateMessages(messages);
-          this.messageRef.current.scrollIntoView({ behavior: 'smooth'})
+          if (this.messageRef && this.messageRef.current) {
+            this.messageRef.current.scrollIntoView({ behavior: 'smooth' })
+          }
         });
     }
   };
@@ -46,12 +49,12 @@ class Chat extends React.Component {
   updateMessages = (messages) => this.setState({ messages });
 
   addMessageToChannel = async () => {
+    const { input } = this.state
     const { selectedChannel, user } = this.props;
-    const content = prompt("What would you like to say?");
     const dbRef = db.collection("channels").doc(selectedChannel.id);
     const newMsg = {
       when: new Date(),
-      content,
+      content: input,
       author: { photoURL: user.photoURL },
     };
     dbRef.update({
@@ -59,9 +62,22 @@ class Chat extends React.Component {
     });
   };
 
+  handleTyping = (e) => {
+    let input = e.target.value;
+    this.setState({ input: input })
+  }
+
+  submitMessage = (e) => {
+    if (e.key === 'Enter') {
+      this.setState({ input: "" })
+      return this.addMessageToChannel()
+    }
+    
+  }
+
   render() {
-    const { messages } = this.state;
-    const { classes } = this.state;
+    const { messages, input } = this.state;
+    const { classes } = this.props;
     return (
       <div
         style={{
@@ -96,9 +112,8 @@ class Chat extends React.Component {
               >
                 <Paper
                   style={{
-                    backgroundImage: `url(${
-                      msg.author ? msg.author.photoURL : ""
-                    })`,
+                    backgroundImage: `url(${msg.author ? msg.author.photoURL : ""
+                      })`,
                     borderRadius: 20,
                     backgroundSize: "contain",
                     height: 40,
@@ -120,53 +135,40 @@ class Chat extends React.Component {
               </Paper>
             ))
           ) : (
-            <Paper
-              style={{
-                minHeight: 40,
-                display: "flex",
-                flexDirection: "row",
-                margin: 12,
-                padding: 14,
-                backgroundColor: "#3b3b3b",
-                width: "80%",
-              }}
-            >
               <Paper
                 style={{
-                  backgroundImage: `url(https://images.unsplash.com/photo-1503797558227-76451ba6de08?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MzN8fGdvYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60)`,
-                  borderRadius: 20,
-                  backgroundSize: "contain",
-                  height: 40,
-                  width: 40,
-                }}
-              ></Paper>
-              <Typography
-                style={{
-                  fontSize: 14,
-                  marginLeft: 14,
-                  marginTop: 8,
-                  color: "white",
-                  fontWeight: 600,
+                  minHeight: 40,
+                  display: "flex",
+                  flexDirection: "row",
+                  margin: 12,
+                  padding: 14,
+                  backgroundColor: "#3b3b3b",
+                  width: "80%",
                 }}
               >
-                No messages in this channel! Send one to start a conversation.
+                <Paper
+                  style={{
+                    backgroundImage: `url(https://images.unsplash.com/photo-1503797558227-76451ba6de08?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MzN8fGdvYXR8ZW58MHx8MHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60)`,
+                    borderRadius: 20,
+                    backgroundSize: "contain",
+                    height: 40,
+                    width: 40,
+                  }}
+                ></Paper>
+                <Typography
+                  style={{
+                    fontSize: 14,
+                    marginLeft: 14,
+                    marginTop: 8,
+                    color: "white",
+                    fontWeight: 600,
+                  }}
+                >
+                  No messages in this channel! Send one to start a conversation.
               </Typography>
-            </Paper>
-          )}
+              </Paper>
+            )}
         </div>
-        <Button
-          onClick={this.addMessageToChannel}
-          style={{
-            position: "absolute",
-            backgroundColor: "#595959",
-            height: 48,
-            right: 40,
-            bottom: 80,
-          }}
-        >
-          {" "}
-          Add a message
-        </Button>
         <Grid
           container
           spacing={2}
@@ -180,18 +182,17 @@ class Chat extends React.Component {
         >
           <Grid item md={11}>
             <TextField
+              variant='outlined'
+              onKeyPress={this.submitMessage}
+              onChange={this.handleTyping}
+              value={input}
               style={{
                 position: "absolute",
-                height: 48,
-                width: "90%",
-                bottom: -7,
+                width: "95%",
               }}
             />
           </Grid>
           <Grid item alignItems="flex-end" md={1}>
-            <button>
-              <AddCircleIcon />
-            </button>
           </Grid>
         </Grid>
       </div>
