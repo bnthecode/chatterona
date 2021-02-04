@@ -7,8 +7,15 @@ const authReducer = (state = initialState, action) => {
     switch(action.type) {
    
         case 'LOG_USER_IN': {
+            const { user } = action.payload;
             return {
-                ...action.payload
+                ...state,
+                user: { 
+                    displayName: user.displayName,
+                    uid: user.uid,
+                    email: user.email,
+                    photoURL: user.photoURL
+                }
             }  
         }
         default: {

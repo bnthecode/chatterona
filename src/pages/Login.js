@@ -17,7 +17,7 @@ const Login = ({ logInUser, history }) => {
         logInUser(user);
         history.push("/");
       })
-      .catch(() => console.log("yoooo"));
+      .catch((error) => console.log(error.message));
   };
 
   return (

@@ -1,10 +1,5 @@
-import {
-  Typography,
-  Grid,
-  Divider,
-  List,
-  Paper,
-} from "@material-ui/core";
+import { Typography, Grid, Divider, List, Paper } from "@material-ui/core";
+import { makeStyles } from "@material-ui/styles";
 import { useEffect, useState } from "react";
 import { channelService } from "../services";
 import ChannelHeader from "./ChannelHeader";
@@ -12,7 +7,56 @@ import ChannelListItem from "./ChannelListItem";
 import Drawer from "./Drawer";
 import HeaderOptions from "./HeaderOptions";
 
+const useStyles = makeStyles(() => ({
+  drawer: { backgroundColor: "#23272a", width: "310px" },
+  wrapper: { paddingLeft: "72px" },
+  divider: { width: "100%", height: 1, backgroundColor: "#1e1e1e" },
+  list: { width: "100%", margin: 4 },
+  paper: {
+    position: "absolute",
+    backgroundColor: "#282828",
+    bottom: 0,
+    height: 52,
+    width: "calc(100% - 72px)",
+  },
+  bottomPaper: {
+    position: "relative",
+    minHeight: 40,
+    borderRadius: 20,
+    backgroundSize: "contain",
+    margin: 6,
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    cursor: "pointer",
+    height: 40,
+    width: 40,
+  },
+  bottomSpacer: {
+    height: 12,
+    width: 12,
+    position: "absolute",
+    bottom: 0,
+    left: 24,
+    border: "1px solid black",
+    backgroundColor: "#20b673",
+    borderRadius: 6,
+  },
+  userText: {
+    position: "absolute",
+    top: 14,
+    left: 60,
+    fontSize: 12,
+    color: "white",
+    fontWeight: 700,
+  },
+  nameSpan: {
+    whiteSpace: "nowrap",
+  },
+}));
+
 const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
+  const classes = useStyles();
   const [channels, setChannels] = useState([]);
   const [headerOptions, showHeaderOptions] = useState(false);
 
@@ -36,75 +80,34 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   const toggleHeaderOptions = () => showHeaderOptions(!headerOptions);
 
   return (
-    <Drawer anchor="left" width="310px" style={{ backgroundColor: "#23272a" }}>
-      <div style={{ paddingLeft: "72px" }}>
+    <Drawer className={classes.drawer} anchor="left">
+      <div className={classes.wrapper}>
         <ChannelHeader
           serverName={selectedServer.name}
           toggleHeaderOptions={toggleHeaderOptions}
         />
-        <Divider
-          style={{ width: "100%", height: 1, backgroundColor: "#1e1e1e" }}
-        />
+        <Divider className={classes.divider} />
         <Grid container>
-          <List style={{ width: "100%", margin: 4 }}>
-            {channels ? channels.map((chnl) => (
-              <ChannelListItem
-                selected={chnl.id === selectedChannel.id}
-                setChannel={setChannel}
-                channel={chnl}
-              />
-            )): ''}
+          <List className={classes.list}>
+            {channels
+              ? channels.map((chnl) => (
+                  <ChannelListItem
+                    selected={chnl.id === selectedChannel.id}
+                    setChannel={setChannel}
+                    channel={chnl}
+                  />
+                ))
+              : ""}
           </List>
         </Grid>
-        <Paper
-          style={{
-            position: "absolute",
-            backgroundColor: "#282828",
-            bottom: 0,
-            height: 52,
-            width: "calc(100% - 72px)",
-          }}
-        >
+        <Paper className={classes.paper}>
           <Paper
-            style={{
-              backgroundImage: `url(${user.photoURL})`,
-              position: "relative",
-              minHeight: 40,
-              borderRadius: 20,
-              backgroundSize: "contain",
-              margin: 6,
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-around",
-              cursor: "pointer",
-              height: 40,
-              width: 40,
-            }}
+            style={{ backgroundImage: `url(${user.photoURL})` }}
+            className={classes.bottomPaper}
           >
-            <div
-              style={{
-                height: 12,
-                width: 12,
-                position: "absolute",
-                bottom: 0,
-                left: 24,
-                border: "1px solid black",
-                backgroundColor: "#20b673",
-                borderRadius: 6,
-              }}
-            ></div>
-            <Typography
-              variant="body1"
-              style={{
-                position: "absolute",
-                top: 14,
-                left: 60,
-                fontSize: 12,
-                color: "white",
-                fontWeight: 700,
-              }}
-            >
-              <span style={{ whiteSpace: "nowrap" }}>{user.displayName}</span>
+            <div className={classes.bottomSpacer}></div>
+            <Typography variant="body1" className={classes.userText}>
+              <span className={classes.nameSpan}>{user.displayName}</span>
             </Typography>
           </Paper>
         </Paper>

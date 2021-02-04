@@ -92,7 +92,7 @@ const Servers = ({ setServer, setChannel, user }) => {
           selected={isSelected(svr.id)}
           listItemProps={{
             onClick: () => setServer(svr),
-            style: { backgroundImage: `url(${svr.imgUrl})` },
+            style: { backgroundImage: `url(${svr.photoURL})` },
           }}
         />
       ))}

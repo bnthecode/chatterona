@@ -14,14 +14,16 @@ const channelService = {
   },
   addChannel: async (serverId) => {
     const name = prompt("What do you want you your channel to be named?");
-    await db.collection("channels").add({
-      serverId: serverId,
-      name: name,
-      timestamp: new Date(),
-      messages: [],
-      usersTyping: {},
-      voice: true,
-    });
+    if (name) {
+      await db.collection("channels").add({
+        serverId: serverId,
+        name: name,
+        timestamp: new Date(),
+        messages: [],
+        usersTyping: {},
+        voice: false,
+      });
+    }
   },
   addUserTyping: async (channelId, user, typing) => {
     const { uid, displayName } = user;
