@@ -1,10 +1,10 @@
 import { Typography, Grid, Divider, List, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useEffect, useState } from "react";
-import { channelService } from "../services";
+import { channelService } from "../../services";
 import ChannelHeader from "./ChannelHeader";
 import ChannelListItem from "./ChannelListItem";
-import Drawer from "./Drawer";
+import Drawer from "../Drawer";
 import HeaderOptions from "./HeaderOptions";
 
 const useStyles = makeStyles(() => ({

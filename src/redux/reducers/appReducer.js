@@ -1,4 +1,5 @@
 const initialState = {
+  mobileView: false,
   selectedServer: {
     name: "",
     id: "",

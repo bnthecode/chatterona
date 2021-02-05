@@ -19,7 +19,6 @@ const channelService = {
         serverId: serverId,
         name: name,
         timestamp: new Date(),
-        messages: [],
         usersTyping: {},
         voice: false,
       });

@@ -6,7 +6,7 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import { truncateString } from "../utilities";
+import { truncateString } from "../../utilities";
 
 const useStyles = makeStyles((theme) => ({
   channelItem: {

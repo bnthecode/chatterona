@@ -1,12 +1,12 @@
 import { Divider, makeStyles } from "@material-ui/core";
-import Drawer from "./Drawer";
+import Drawer from "../Drawer";
 import AddIcon from "@material-ui/icons/Add";
 import VideogameAssetIcon from "@material-ui/icons/VideogameAsset";
-import { channelService, serverService, userService } from "../services";
+import { channelService, serverService, userService } from "../../services";
 import { useEffect, useState } from "react";
 
 import ServerListItem from "./ServerListItem";
-import AddServerDialog from "./AddServerDialog/AddServerDialog";
+import AddServerDialog from "../AddServerDialog/AddServerDialog";
 
 const useStyles = makeStyles((theme) => ({
   "@global": {

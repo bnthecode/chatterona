@@ -1,10 +1,10 @@
 import { Component } from "react";
 import { connect } from "react-redux";
-import Channels from "../components/Channels";
-import ChannelUsers from "../components/ChannelUsers";
-import Chat from "../components/Chat";
+import Channels from "../components/Channels/Channels";
+import ChannelUsers from "../components/Chat/ChannelUsers";
+import Chat from "../components/Chat/Chat";
 import Header from "../components/Header";
-import Servers from "../components/Servers";
+import Servers from "../components/Servers/Servers";
 import { setChannelRedux, setServerRedux } from "../redux/actions/appActions";
 class Main extends Component {
   render() {
@@ -14,12 +14,13 @@ class Main extends Component {
       selectedServer,
       selectedChannel,
       user,
+      mobileView,
     } = this.props;
     const { id } = selectedChannel;
     
     return (
       <>
-        <Header />
+        <Header mobileView={mobileView} />
         <Channels
           selectedServer={selectedServer}
           setChannel={setChannel}
@@ -43,6 +44,7 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   selectedServer: state.app.selectedServer,
   selectedChannel: state.app.selectedChannel,
+  mobileView: state.app.mobileView
 });
 
 const mapDispatchToProps = (dispatch) => ({
