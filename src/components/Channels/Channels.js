@@ -168,7 +168,7 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
                     .map((chnl) => (
                       <ChannelListItem
                         selected={chnl.id === selectedChannel.id}
-                        iconLeft={chnl.voice ? faVolumeUp : faHashtag}
+                        iconLeft={chnl.type === 'voice' ? faVolumeUp : faHashtag}
                         onClick={() => setChannel(chnl)}
                         title={chnl.name}
                       />

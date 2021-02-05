@@ -3,7 +3,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Paper, Typography } from "@material-ui/core";
-import { Album } from "@material-ui/icons";
 
 const ChannelHeader = ({ serverName, toggleHeaderOptions }) => {
   return (
