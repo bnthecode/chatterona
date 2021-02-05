@@ -6,13 +6,14 @@ const animals = [
     'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTd8fGZ1bm55JTIwZG9nc3xlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
     'https://images.unsplash.com/photo-1552944150-6dd1180e5999?ixid=MXwxMjA3fDB8MHxzZWFyY2h8MTN8fGZ1bm55JTIwY2F0c3xlbnwwfHwwfA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
 ]
+const randomKey = Math.floor(Math.random() * 800).toString();
 
 const config = {
     environment: process.env.NODE_ENV,
     devUser: {
-        uid: Math.floor(Math.random() * 800),
+        uid: randomKey,
         photoURL: animals[Math.floor(Math.random() * 6)],
-        displayName:'Chatterona Bot', 
+        displayName:`Chatterona Bot_${randomKey}`, 
     }
 }
 export default config;

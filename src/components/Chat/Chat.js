@@ -63,7 +63,7 @@ class Chat extends React.Component {
   }
   state = {
     messages: [],
-    usersTyping: [],
+    usersTyping: {},
     input: "",
   };
 
@@ -93,6 +93,11 @@ class Chat extends React.Component {
         if (this.messageRef && this.messageRef.current) {
           this.messageRef.current.scrollIntoView({ behavior: "smooth" });
         }
+      });
+    db.collection("channels")
+      .doc(channelId)
+      .onSnapshot((snapshot) => {
+        this.setState({ usersTyping: snapshot.data().usersTyping });
       });
   };
 
@@ -180,9 +185,32 @@ class Chat extends React.Component {
     return !moment(currentDate).isSame(previousDate, "day");
   };
 
+  getUserTypings = () => {
+    const { usersTyping } = this.state;
+    const { user } = this.props;
+    let headline = "";
+    const typers = Object.keys(usersTyping).reduce((acc, key) => {
+      if (usersTyping[key].typing) acc = [...acc, usersTyping[key].name];
+      return acc;
+    }, []);
+    if (typers.length > 2) headline = "Holy cow! Too many people to count!";
+    else {
+      const everyoneButMe = typers.filter((n) => n !== user.displayName);
+      headline = everyoneButMe.length
+        ? everyoneButMe.join(", ") + " are typing..."
+        : "";
+    }
+    return (
+      <span style={{ fontSize: 12, fontWeight: 600, marginLeft: 8 }}>
+        {headline}
+      </span>
+    );
+  };
+
   render() {
-    const { messages, input, usersTyping } = this.state;
+    const { messages, input } = this.state;
     const { classes, selectedChannel, user } = this.props;
+    console.log(user.uid);
     return (
       <div
         style={{
@@ -344,16 +372,11 @@ class Chat extends React.Component {
             )}
           </div>
         </div>
-
-        {Object.keys(usersTyping).map((key) =>
-          key !== user.uid ? (
-            <Typography className={classes.userTypings}>
-              <span>{`${usersTyping[key]} is typing...`}</span>
-            </Typography>
-          ) : (
-            ""
-          )
-        )}
+        <div style={{ display: "flex", flexDirection: "row" }}>
+          <Typography className={classes.userTypings}>
+            {this.getUserTypings()}
+          </Typography>
+        </div>
 
         <TextField
           InputProps={{ classes: { input: classes.input2 } }}

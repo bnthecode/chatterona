@@ -1,4 +1,5 @@
-import db, { firestore } from "../firebase";
+import db from "../firebase";
+import moment from 'moment';
 
 const channelService = {
   getChannels: async (serverId) => {
@@ -13,24 +14,26 @@ const channelService = {
     return channelList || [];
   },
   addChannel: async (serverId, channel) => {
-      await db.collection("channels").add({
-        serverId: serverId,
-        name: channel.name,
-        timestamp: new Date(),
-        usersTyping: {},
-        type: channel.type,
-      });
+    await db.collection("channels").add({
+      serverId: serverId,
+      name: channel.name,
+      timestamp: new Date(),
+      usersTyping: {},
+      type: channel.type,
+    });
   },
   addUserTyping: async (channelId, user, typing) => {
     const { uid, displayName } = user;
-    const dbRef = db.collection("channels").doc(channelId);
-    const query = typing
-      ? { usersTyping: { [uid]: displayName } }
-      : { ["usersTyping." + uid]: firestore.FieldValue.delete() };
 
-    await dbRef.update({
-      ...query,
-    });
+    const dbRef = db.collection("channels").doc(channelId);
+    const query = { usersTyping: { [uid]: { name: displayName, typing, started: moment().format() } } };
+
+    await dbRef.set(
+      {
+        ...query,
+      },
+      { merge: true }
+    );
   },
 };
 
