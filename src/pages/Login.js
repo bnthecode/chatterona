@@ -67,7 +67,7 @@ const Login = ({ logInUser, history }) => {
         Log in
       </Button>
       <span style={{ position: "absolute", color: 'white', bottom: 4, right: 0, fontSize: 12 }}>
-        1.2
+        2/5/21 6:02AM
       </span>
     </div>
   );
