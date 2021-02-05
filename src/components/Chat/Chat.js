@@ -190,15 +190,13 @@ class Chat extends React.Component {
     const { user } = this.props;
     let headline = "";
     const typers = Object.keys(usersTyping).reduce((acc, key) => {
-      if (usersTyping[key].typing) acc = [...acc, usersTyping[key].name];
+      if (usersTyping[key].typing && usersTyping[key].name !== user.displayName)
+        acc = [...acc, usersTyping[key].name];
       return acc;
     }, []);
     if (typers.length > 2) headline = "Holy cow! Too many people to count!";
     else {
-      const everyoneButMe = typers.filter((n) => n !== user.displayName);
-      headline = everyoneButMe.length
-        ? everyoneButMe.join(", ") + " are typing..."
-        : "";
+      headline = typers.length ? typers.join(", ") + " are typing..." : "";
     }
     return (
       <span style={{ fontSize: 12, fontWeight: 600, marginLeft: 8 }}>
@@ -209,8 +207,7 @@ class Chat extends React.Component {
 
   render() {
     const { messages, input } = this.state;
-    const { classes, selectedChannel, user } = this.props;
-    console.log(user.uid);
+    const { classes, selectedChannel } = this.props;
     return (
       <div
         style={{
