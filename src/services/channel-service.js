@@ -12,17 +12,14 @@ const channelService = {
     }));
     return channelList || [];
   },
-  addChannel: async (serverId) => {
-    const name = prompt("What do you want you your channel to be named?");
-    if (name) {
+  addChannel: async (serverId, channel) => {
       await db.collection("channels").add({
         serverId: serverId,
-        name: name,
+        name: channel.name,
         timestamp: new Date(),
         usersTyping: {},
-        voice: false,
+        type: channel.type,
       });
-    }
   },
   addUserTyping: async (channelId, user, typing) => {
     const { uid, displayName } = user;

@@ -14,28 +14,19 @@ const ChannelHeader = ({ serverName, toggleHeaderOptions }) => {
         cursor: "pointer",
         position: "relative",
         height: 46,
+        display: 'flex',
+        alignItems: 'center',
         backgroundColor: "#23272a",
         borderBottom: "1px solid #1e1e1e",
+        paddingLeft: 18,
       }}
     >
-      <Album
-        style={{
-          position: "absolute",
-          color: "white",
-          left: 12,
-          top: "calc(50% - 10px)",
-          margin: "2px 6px 0px 12px",
-          fontSize: 14,
-        }}
-      ></Album>
+
       <Typography
         style={{
-          position: "absolute",
-          top: "calc(50% - 12px)",
-          left: 46,
-          color: "white",
-          fontSize: 14,
-          fontWeight: 700,
+          color: '#fff',
+          fontWeight: 600,
+          marginRight: 'auto'
         }}
       >
         {serverName}
