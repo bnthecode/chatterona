@@ -30,6 +30,18 @@ const theme = createMuiTheme({
       '"Segoe UI Symbol"',
     ].join(','),
   },
+  overrides: {
+      MuiTooltip: {
+        tooltip: {
+          fontSize: 12,
+          opacity: '.8',
+          fontWeight: 700,
+          color: "#fff",
+          padding: 10,
+          backgroundColor: "#202225",
+        }
+    }
+  }
 });
 
 export default theme;

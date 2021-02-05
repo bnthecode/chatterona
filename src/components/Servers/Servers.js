@@ -1,3 +1,4 @@
+
 import { Divider, makeStyles } from "@material-ui/core";
 import Drawer from "../Drawer";
 import AddIcon from "@material-ui/icons/Add";
@@ -51,9 +52,11 @@ const Servers = ({ setServer, setChannel, user }) => {
     const fetchServers = async () => {
       const servers = await serverService.getServers();
       setServers(servers);
+      setServer(servers[0]);
+      setSelected(servers[0].id);
     };
     fetchServers();
-  }, []);
+  }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
   const handleServerSelection = async (id) => {
     setSelected(id);
@@ -66,9 +69,20 @@ const Servers = ({ setServer, setChannel, user }) => {
   const handleAddServer = async (serverName) => {
     const newServer = await serverService.addServer(serverName, user);
     const userData = { assocatiedServers: [newServer.id] };
+    await channelService.addChannel(newServer.id, {
+      name: "general",
+      type: "text",
+    });
+    await channelService.addChannel(newServer.id, {
+      name: "General",
+      type: "voice",
+    });
     await userService.updateUser(userData, user.uid);
     const serverList = await serverService.getServers();
+    const lastServer = serverList[serverList.length - 1];
     setServers(serverList);
+    setServer(lastServer);
+    setSelected(lastServer.id);
     setAddServerDialogOpen(false);
   };
 

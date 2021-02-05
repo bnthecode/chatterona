@@ -21,8 +21,8 @@ const useStyles = makeStyles((theme) => ({
   },
   menu: {
     position: "absolute",
-    top: 46,
-    left: 92,
+    top: 54,
+    left: 86,
     padding: 6,
     width: "calc(100% - 110px)",
     backgroundColor: "#1e1e1e",

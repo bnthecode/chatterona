@@ -1,8 +1,8 @@
-import db from "../firebase";
+import db, { firestore } from "../firebase";
 
 const serverService = {
   getServers: async () => {
-    const snapshot = await db.collection("servers").get();
+    const snapshot = await db.collection("servers").orderBy('timestamp', 'asc').get();
     return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
   },
 
@@ -10,6 +10,7 @@ const serverService = {
     return db.collection("servers").add({
       name: serverName,
       photoURL: user.photoURL,
+      timestamp: firestore.FieldValue.serverTimestamp(),
       associatedUsers: {
         [user.uid]: {
           displayName: user.displayName,
@@ -18,7 +19,6 @@ const serverService = {
         },
       },
       owner: user.displayName,
-      timestamp: new Date(),
     });
   },
 };
