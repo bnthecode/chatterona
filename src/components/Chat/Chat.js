@@ -1,8 +1,6 @@
-import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { Grid, Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import moment from "moment";
-import nodeNotifier from "node-notifier";
 import React from "react";
 import db, { firestore } from "../../firebase";
 import channelService from "../../services/channel-service";
@@ -83,23 +81,11 @@ class Chat extends React.Component {
   };
 
   registerChannelListener = (channelId) => {
-    console.log('running')
     db.collection("channels")
       .doc(channelId)
       .collection("messages")
       .orderBy("timestamp", "asc")
       .onSnapshot((snapshot) => {
-        const lastMessage = snapshot.docs[snapshot.docs.length - 1];
-        const lastMessageData = lastMessage && lastMessage.data();
-        const lastMessageContent =
-        lastMessageData.content[lastMessage.data().content.length - 1];
-        if (
-          snapshot.docs.length !== this.state.messages &&
-          this.state.messages.length > 0 &&
-          lastMessageData.author.uid !== this.props.user.uid
-        ) {
-          /// send notification
-        }
         this.setState({
           messages: snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })),
         });

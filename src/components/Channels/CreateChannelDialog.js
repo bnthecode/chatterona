@@ -101,7 +101,7 @@ const CreateChannelDialog = ({
       open={open}
     >
       <FontAwesomeIcon
-        onClick={() => setChannelDialogOpen(false)}
+        onClick={() => setChannelDialogOpen({...showChannelDialog, open: false })}
         className={classes.closeBtn}
         icon={faTimes}
       ></FontAwesomeIcon>
