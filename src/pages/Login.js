@@ -66,8 +66,8 @@ const Login = ({ logInUser, history }) => {
         />
         Log in
       </Button>
-      <span style={{ position: "absolute", bottom: 4, right: 0, fontSize: 12 }}>
-        1.0
+      <span style={{ position: "absolute", color: 'white', bottom: 4, right: 0, fontSize: 12 }}>
+        1.2
       </span>
     </div>
   );
