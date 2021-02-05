@@ -7,9 +7,7 @@ import {
   Paper,
   TextField,
 } from "@material-ui/core";
-import {
-  faCamera,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 
@@ -64,7 +62,6 @@ const useStyles = makeStyles((theme) => ({
     height: 90,
     width: 90,
     border: "2px dashed grey",
-    cursor: "pointer",
   },
   uploadIcon: {
     color: "grey",
@@ -86,10 +83,15 @@ const useStyles = makeStyles((theme) => ({
     height: 36,
     fontSize: 12,
   },
+  uploadLabel: {
+    cursor: "pointer",
+  },
 }));
 const PageThree = ({ setStep, step, onComplete, user }) => {
   const classes = useStyles();
   const [serverName, setServerName] = useState("");
+  const [serverImg, setServerImg] = useState("");
+
   return (
     <>
       <DialogTitle>
@@ -101,11 +103,19 @@ const PageThree = ({ setStep, step, onComplete, user }) => {
       </DialogTitle>
 
       <Paper className={classes.uploadWrapper}>
-        <FontAwesomeIcon
-          className={classes.uploadIcon}
-          icon={faCamera}
-        ></FontAwesomeIcon>
-        <Typography className={classes.uploadText}>UPLOAD</Typography>
+        <Typography className={classes.uploadText}>
+          <label htmlFor="file-upload" className={classes.uploadLabel}>
+            <FontAwesomeIcon
+              className={classes.uploadIcon}
+              icon={faCamera}
+            ></FontAwesomeIcon>
+          </label>
+          <input
+            onChange={({ target: { files } }) => setServerImg(files[0])}
+            id="file-upload"
+            type="file"
+          />
+        </Typography>
       </Paper>
       <InputLabel className={classes.label} htmlFor="server-name">
         SERVER NAME
@@ -130,7 +140,7 @@ const PageThree = ({ setStep, step, onComplete, user }) => {
           Back
         </Typography>
         <Button
-          onClick={() => onComplete(serverName)}
+          onClick={() => onComplete({ name: serverName, file: serverImg })}
           className={classes.footerButton}
         >
           Create

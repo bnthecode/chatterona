@@ -1,6 +1,8 @@
-import { Paper, TextField, Typography } from "@material-ui/core";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { Grid, Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import moment from "moment";
+import nodeNotifier from "node-notifier";
 import React from "react";
 import db, { firestore } from "../../firebase";
 import channelService from "../../services/channel-service";
@@ -74,20 +76,34 @@ class Chat extends React.Component {
 
   componentDidUpdate = (prevProps, prevState) => {
     const { selectedChannel } = this.props;
+
     if (prevProps.selectedChannel.id !== selectedChannel.id) {
       this.registerChannelListener(selectedChannel.id);
     }
   };
 
   registerChannelListener = (channelId) => {
+    console.log('running')
     db.collection("channels")
       .doc(channelId)
       .collection("messages")
       .orderBy("timestamp", "asc")
       .onSnapshot((snapshot) => {
+        const lastMessage = snapshot.docs[snapshot.docs.length - 1];
+        const lastMessageData = lastMessage && lastMessage.data();
+        const lastMessageContent =
+        lastMessageData.content[lastMessage.data().content.length - 1];
+        if (
+          snapshot.docs.length !== this.state.messages &&
+          this.state.messages.length > 0 &&
+          lastMessageData.author.uid !== this.props.user.uid
+        ) {
+          /// send notification
+        }
         this.setState({
           messages: snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })),
         });
+
         if (this.messageRef && this.messageRef.current) {
           this.messageRef.current.scrollIntoView({ behavior: "smooth" });
         }
@@ -106,8 +122,9 @@ class Chat extends React.Component {
       .doc(selectedChannel.id)
       .collection("messages")
       .add({
-        content: [{message: input, date: moment().format("lll") }],
+        content: [{ message: input, date: moment().format("lll") }],
         timestamp: firestore.FieldValue.serverTimestamp(),
+        date: moment().format("lll"),
         author: {
           photoURL: user.photoURL,
           name: user.displayName,
@@ -129,9 +146,20 @@ class Chat extends React.Component {
     const { messages } = this.state;
     if (e.key === "Enter") {
       const lastMsg = messages[messages.length - 1];
-      if (lastMsg && lastMsg.author.uid === user.uid) {
-        console.log(lastMsg.id);
-        console.log("you sent the last one");
+      const previousTime =
+        lastMsg && lastMsg.content.length
+          ? lastMsg.content[lastMsg.content.length - 1].date
+          : null;
+
+      const minutesPassedSincePrev = moment().diff(previousTime, "minutes");
+      // generate new message if user has not sent a message in the last 20 minutes AND
+      // if they are the previous author
+      const addMessageToPrevious =
+        minutesPassedSincePrev < 20 &&
+        lastMsg &&
+        lastMsg.author.uid === user.uid;
+
+      if (addMessageToPrevious) {
         db.collection("channels")
           .doc(selectedChannel.id)
           .collection("messages")
@@ -143,7 +171,7 @@ class Chat extends React.Component {
                 date: moment().format("lll"),
               }),
               timestamp: firestore.FieldValue.serverTimestamp(),
-
+              date: moment().format("lll"),
               author: {
                 photoURL: user.photoURL,
                 name: user.displayName,
@@ -160,6 +188,10 @@ class Chat extends React.Component {
       channelService.addUserTyping(selectedChannel.id, user, false);
       return this.addMessageToChannel();
     }
+  };
+
+  isNewDay = (currentDate, previousDate) => {
+    return !moment(currentDate).isSame(previousDate, "day");
   };
 
   render() {
@@ -190,70 +222,105 @@ class Chat extends React.Component {
           >
             {messages && messages.length ? (
               messages.map((msg, i) => (
-                <Paper
-                  elevation={0}
-                  ref={i === messages.length - 1 ? this.messageRef : null}
-                  style={{
-                    minHeight: 40,
-
-                    display: "flex",
-                    justifyContent: "flex-start",
-                    flexDirection: "row",
-                    padding: 14,
-                    backgroundColor: "transparent",
-                    overflowY: "auto",
-                    width: "80%",
-                  }}
-                >
+                <div>
+                  <Grid item xs={12}>
+                    {this.isNewDay(
+                      msg.date,
+                      messages[i - 1] ? messages[i - 1].date : msg.date
+                    ) ? (
+                      <Paper
+                        elevation={0}
+                        square
+                        style={{
+                          height: 20,
+                          textAlign: "center",
+                          backgroundColor: "transparent",
+                          width: "calc(100% - 30px",
+                          borderBottom: "1px solid grey",
+                          padding: 8,
+                        }}
+                      >
+                        <Typography
+                          style={{
+                            color: "grey",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {moment(msg.date).format("MMMM DD, YYYY")}
+                        </Typography>
+                      </Paper>
+                    ) : (
+                      ""
+                    )}
+                  </Grid>
                   <Paper
+                    elevation={0}
+                    ref={i === messages.length - 1 ? this.messageRef : null}
                     style={{
-                      backgroundImage: `url(${
-                        msg.author ? msg.author.photoURL : ""
-                      })`,
-                      borderRadius: 20,
-                      backgroundSize: "contain",
-                      height: 40,
-                      width: 40,
-                    }}
-                  ></Paper>
-                  <Typography
-                    style={{
-                      fontSize: 14,
-                      marginLeft: 14,
+                      minHeight: 40,
 
-                      color: "white",
-                      fontWeight: 600,
+                      display: "flex",
+                      justifyContent: "flex-start",
+                      flexDirection: "row",
+                      padding: 14,
+                      backgroundColor: "transparent",
+                      overflowY: "auto",
+                      width: "80%",
                     }}
                   >
+                    <Paper
+                      style={{
+                        backgroundImage: `url(${
+                          msg.author ? msg.author.photoURL : ""
+                        })`,
+                        borderRadius: 20,
+                        backgroundSize: "contain",
+                        height: 40,
+                        width: 40,
+                      }}
+                    ></Paper>
                     <Typography
                       style={{
-                        fontSize: 12,
+                        fontSize: 14,
+                        marginLeft: 22,
+
                         color: "white",
                         fontWeight: 600,
                       }}
                     >
-                      {" "}
-                      {msg.author.name}
-                    </Typography>
-
-                    {msg.content.map((content) => (
-                      <div>
+                      <Typography
+                        style={{
+                          fontSize: 12,
+                          color: "white",
+                          fontWeight: 800,
+                        }}
+                      >
                         {" "}
-                        {content.message} <br />
+                        {msg.author.name}
+                        <span
+                          style={{
+                            fontSize: 10,
+
+                            color: "grey",
+                            fontWeight: 500,
+                            marginLeft: 16,
+                          }}
+                        >
+                          {msg.date}
+                        </span>
+                      </Typography>
+                      <div style={{ marginTop: 4 }}>
+                        {msg.content.map((content) => (
+                          <div>
+                            {" "}
+                            {content.message} <br />
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </Typography>
-                  <Typography
-                    style={{
-                      marginLeft: 16,
-                      marginTop: 2,
-                      color: "grey",
-                      fontSize: 10,
-                    }}
-                  >
-                    {msg.content[0].date}
-                  </Typography>
-                </Paper>
+                    </Typography>
+                  </Paper>
+                </div>
               ))
             ) : (
               <Paper

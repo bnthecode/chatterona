@@ -52,8 +52,8 @@ const Servers = ({ setServer, setChannel, user }) => {
     const fetchServers = async () => {
       const servers = await serverService.getServers();
       setServers(servers);
-      setServer(servers[0]);
-      setSelected(servers[0].id);
+      setServer(servers.length ? servers[0] : {});
+      setSelected(servers.length ? servers[0].id : {});
     };
     fetchServers();
   }, []);// eslint-disable-line react-hooks/exhaustive-deps
@@ -66,8 +66,8 @@ const Servers = ({ setServer, setChannel, user }) => {
     setChannel(channels.length ? channels[0] : {});
   };
 
-  const handleAddServer = async (serverName) => {
-    const newServer = await serverService.addServer(serverName, user);
+  const handleAddServer = async (server) => {
+    const newServer = await serverService.addServer(server, user);
     const userData = { assocatiedServers: [newServer.id] };
     await channelService.addChannel(newServer.id, {
       name: "general",

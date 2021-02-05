@@ -1,4 +1,4 @@
-import db, { firestore } from "../firebase";
+import db, { firestore, storage } from "../firebase";
 
 const serverService = {
   getServers: async () => {
@@ -6,10 +6,16 @@ const serverService = {
     return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
   },
 
-  addServer: async (serverName, user) => {
+  addServer: async (server, user) => {
+    const storageRef = storage.ref();
+    const fileRef = storageRef.child(server.file.name);
+    await fileRef.put(server.file).then((idk) => console.log(idk) );
+   const imgUrl = await storage.ref(server.file.name).getDownloadURL();
+
+
     return db.collection("servers").add({
-      name: serverName,
-      photoURL: user.photoURL,
+      name: server.name,
+      photoURL: imgUrl,
       timestamp: firestore.FieldValue.serverTimestamp(),
       associatedUsers: {
         [user.uid]: {

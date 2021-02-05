@@ -7,6 +7,11 @@ import Header from "../components/Header";
 import Servers from "../components/Servers/Servers";
 import { setChannelRedux, setServerRedux } from "../redux/actions/appActions";
 class Main extends Component {
+  componentDidMount = () => {
+    Notification.requestPermission().then(function (result) {
+
+    });
+  };
   render() {
     const {
       setServer,
@@ -17,7 +22,7 @@ class Main extends Component {
       mobileView,
     } = this.props;
     const { id } = selectedChannel;
-    
+
     return (
       <>
         <Header mobileView={mobileView} />
@@ -44,7 +49,7 @@ const mapStateToProps = (state) => ({
   user: state.auth.user,
   selectedServer: state.app.selectedServer,
   selectedChannel: state.app.selectedChannel,
-  mobileView: state.app.mobileView
+  mobileView: state.app.mobileView,
 });
 
 const mapDispatchToProps = (dispatch) => ({

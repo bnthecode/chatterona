@@ -31,6 +31,7 @@ const useStyles = makeStyles(() => ({
     position: "absolute",
     backgroundColor: "#282828",
     bottom: 0,
+    padding: 8,
     height: 52,
     width: "calc(100% - 72px)",
   },
@@ -60,7 +61,7 @@ const useStyles = makeStyles(() => ({
   userText: {
     position: "absolute",
     top: 14,
-    left: 60,
+    left: 50,
     fontSize: 12,
     color: "white",
     fontWeight: 700,
