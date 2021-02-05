@@ -1,4 +1,4 @@
-import { auth } from "../firebase";
+import { auth, provider } from "../firebase";
 
 const userService = {
   updateUser: async (modifiedFields, uid) => {
@@ -9,6 +9,15 @@ const userService = {
     } catch (err) {
       console.log(err);
     }
+  },
+  signInGoogle: async () => {
+    try {
+      const user = await auth.signInWithPopup(provider);
+      return user;
+    } catch (err) {
+      console.log("error loggin in user", err.message);
+    }
+    return {};
   },
 };
 

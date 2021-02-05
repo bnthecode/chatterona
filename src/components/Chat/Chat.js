@@ -1,7 +1,9 @@
 import { Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
+import moment from "moment";
 import React from "react";
-import db, { firestore } from "../firebase";
+import db, { firestore } from "../../firebase";
+import channelService from "../../services/channel-service";
 
 const styles = () => ({
   "@global": {
@@ -45,6 +47,13 @@ const styles = () => ({
     bottom: 0,
     borderRadius: 8,
   },
+  userTypings: {
+    width: 400,
+    position: "absolute",
+    bottom: 60,
+    borderRadius: 8,
+    color: "white",
+  },
 });
 
 class Chat extends React.Component {
@@ -54,6 +63,7 @@ class Chat extends React.Component {
   }
   state = {
     messages: [],
+    usersTyping: [],
     input: "",
   };
 
@@ -62,7 +72,7 @@ class Chat extends React.Component {
     this.registerChannelListener(selectedChannel.id);
   };
 
-  componentDidUpdate = (prevProps) => {
+  componentDidUpdate = (prevProps, prevState) => {
     const { selectedChannel } = this.props;
     if (prevProps.selectedChannel.id !== selectedChannel.id) {
       this.registerChannelListener(selectedChannel.id);
@@ -72,9 +82,12 @@ class Chat extends React.Component {
   registerChannelListener = (channelId) => {
     db.collection("channels")
       .doc(channelId)
-      .onSnapshot((doc) => {
-        const { messages } = doc.data();
-        this.updateMessages(messages);
+      .collection("messages")
+      .orderBy("timestamp", "asc")
+      .onSnapshot((snapshot) => {
+        this.setState({
+          messages: snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })),
+        });
         if (this.messageRef && this.messageRef.current) {
           this.messageRef.current.scrollIntoView({ behavior: "smooth" });
         }
@@ -84,35 +97,74 @@ class Chat extends React.Component {
   updateMessages = (messages) => this.setState({ messages });
 
   addMessageToChannel = async () => {
+    this.setState({ userTyping: false });
     const { input } = this.state;
     const { selectedChannel, user } = this.props;
-    const dbRef = db.collection("channels").doc(selectedChannel.id);
-    const newMsg = {
-      when: new Date(),
-      content: input,
-      date: new Date(),
-      author: { photoURL: user.photoURL, name: user.displayName },
-    };
-    dbRef.update({
-      messages: firestore.FieldValue.arrayUnion(newMsg),
-    });
+
+    await db
+      .collection("channels")
+      .doc(selectedChannel.id)
+      .collection("messages")
+      .add({
+        content: [{message: input, date: moment().format("lll") }],
+        timestamp: firestore.FieldValue.serverTimestamp(),
+        author: {
+          photoURL: user.photoURL,
+          name: user.displayName,
+          uid: user.uid,
+        },
+      });
   };
 
   handleTyping = (e) => {
+    this.setState({ userTyping: true });
+    const { selectedChannel, user } = this.props;
+    channelService.addUserTyping(selectedChannel.id, user, true);
     let input = e.target.value;
     this.setState({ input: input });
   };
 
   submitMessage = (e) => {
+    const { selectedChannel, user } = this.props;
+    const { messages } = this.state;
     if (e.key === "Enter") {
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg && lastMsg.author.uid === user.uid) {
+        console.log(lastMsg.id);
+        console.log("you sent the last one");
+        db.collection("channels")
+          .doc(selectedChannel.id)
+          .collection("messages")
+          .doc(lastMsg.id)
+          .update(
+            {
+              content: firestore.FieldValue.arrayUnion({
+                message: this.state.input,
+                date: moment().format("lll"),
+              }),
+              timestamp: firestore.FieldValue.serverTimestamp(),
+
+              author: {
+                photoURL: user.photoURL,
+                name: user.displayName,
+                uid: user.uid,
+              },
+            },
+            { merge: true }
+          );
+        this.setState({ input: "" });
+        channelService.addUserTyping(selectedChannel.id, user, false);
+        return;
+      }
       this.setState({ input: "" });
+      channelService.addUserTyping(selectedChannel.id, user, false);
       return this.addMessageToChannel();
     }
   };
 
   render() {
-    const { messages, input } = this.state;
-    const { classes, selectedChannel } = this.props;
+    const { messages, input, usersTyping } = this.state;
+    const { classes, selectedChannel, user } = this.props;
     return (
       <div
         style={{
@@ -184,7 +236,12 @@ class Chat extends React.Component {
                       {msg.author.name}
                     </Typography>
 
-                    {msg.content}
+                    {msg.content.map((content) => (
+                      <div>
+                        {" "}
+                        {content.message} <br />
+                      </div>
+                    ))}
                   </Typography>
                   <Typography
                     style={{
@@ -194,8 +251,7 @@ class Chat extends React.Component {
                       fontSize: 10,
                     }}
                   >
-                    {" "}
-                    {"02/03/2021"}{" "}
+                    {msg.content[0].date}
                   </Typography>
                 </Paper>
               ))
@@ -235,6 +291,17 @@ class Chat extends React.Component {
             )}
           </div>
         </div>
+
+        {Object.keys(usersTyping).map((key) =>
+          key !== user.uid ? (
+            <Typography className={classes.userTypings}>
+              <span>{`${usersTyping[key]} is typing...`}</span>
+            </Typography>
+          ) : (
+            ""
+          )
+        )}
+
         <TextField
           InputProps={{ classes: { input: classes.input2 } }}
           variant="outlined"

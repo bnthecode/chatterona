@@ -2,7 +2,7 @@ import {
   makeStyles,
 } from "@material-ui/core";
 
-import Drawer from "./Drawer";
+import Drawer from "../Drawer";
 
 const useStyles = makeStyles(() => ({
   drawer: {
