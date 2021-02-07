@@ -10,6 +10,7 @@ import {
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
+import FileInput from "../../FileInput";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -73,6 +74,16 @@ const useStyles = makeStyles((theme) => ({
     color: "grey",
     fontSize: 12,
   },
+  "@global": {
+    "*::-webkit-file-upload-button": {
+      color: "red",
+      padding: "1em",
+      cursor: "pointer",
+      backgroundColor: "transparent",
+      border: "none",
+    },
+  },
+
   label: {
     fontSize: 12,
     fontWeight: 700,
@@ -86,11 +97,33 @@ const useStyles = makeStyles((theme) => ({
   uploadLabel: {
     cursor: "pointer",
   },
+  btn: {
+    cursor: "pointer",
+    border: "none",
+    backgroundColor: "transparent",
+    "&:focus": {
+      outline: "none",
+      border: "none",
+      backgroundColor: "transparent",
+    },
+  },
+  icon: {
+    color: "grey",
+    fontSize: 40,
+  },
 }));
 const PageThree = ({ setStep, step, onComplete, user }) => {
   const classes = useStyles();
   const [serverName, setServerName] = useState("");
   const [serverImg, setServerImg] = useState("");
+
+  const fileHandler = (e) => {
+    setServerImg(e.target.files[0]);
+  };
+
+  const upload = () => {
+    document.getElementById("selectImage").click();
+  };
 
   return (
     <>
@@ -104,17 +137,16 @@ const PageThree = ({ setStep, step, onComplete, user }) => {
 
       <Paper className={classes.uploadWrapper}>
         <Typography className={classes.uploadText}>
-          <label htmlFor="file-upload" className={classes.uploadLabel}>
-            <FontAwesomeIcon
-              className={classes.uploadIcon}
-              icon={faCamera}
-            ></FontAwesomeIcon>
-          </label>
-          <input
-            onChange={({ target: { files } }) => setServerImg(files[0])}
-            id="file-upload"
-            type="file"
-          />
+
+          <div style={{ display: "grid" }}>
+            <button className={classes.btn} id="plus" onClick={upload}>
+              <FontAwesomeIcon
+                className={classes.icon}
+                icon={faCamera}
+              ></FontAwesomeIcon>
+            </button>
+            <input id="selectImage" hidden type="file" onChange={fileHandler} />
+          </div>
         </Typography>
       </Paper>
       <InputLabel className={classes.label} htmlFor="server-name">

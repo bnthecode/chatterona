@@ -1,9 +1,16 @@
-import { Grid, Paper, TextField, Typography } from "@material-ui/core";
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import moment from "moment";
 import React from "react";
 import db, { firestore } from "../../firebase";
 import channelService from "../../services/channel-service";
+import FileInput from "../FileInput";
+import "../../utilities";
+import { validateUrl } from "../../utilities";
+import clsx from "clsx";
+import ChatItem from "./ChatItem";
 
 const styles = () => ({
   "@global": {
@@ -54,6 +61,24 @@ const styles = () => ({
     borderRadius: 8,
     color: "white",
   },
+  btn: {
+    cursor: "pointer",
+    border: "none",
+    backgroundColor: "transparent",
+    "&:focus": {
+      outline: "none",
+      border: "none",
+      backgroundColor: "transparent",
+    },
+  },
+  icon: {
+    color: "lightgrey",
+    fontSize: 24,
+    marginRight: 16,
+  },
+  link: {
+    color: "#2196f3",
+  },
 });
 
 class Chat extends React.Component {
@@ -64,7 +89,9 @@ class Chat extends React.Component {
   state = {
     messages: [],
     usersTyping: {},
-    input: "",
+    message: {
+      content: "",
+    },
   };
 
   componentDidMount = () => {
@@ -105,7 +132,7 @@ class Chat extends React.Component {
 
   addMessageToChannel = async () => {
     this.setState({ userTyping: false });
-    const { input } = this.state;
+    const { message, link } = this.state;
     const { selectedChannel, user } = this.props;
 
     await db
@@ -113,7 +140,14 @@ class Chat extends React.Component {
       .doc(selectedChannel.id)
       .collection("messages")
       .add({
-        content: [{ message: input, date: moment().format("lll") }],
+        content: [
+          {
+            message: this.state.message.content,
+            url: link ? this.state.message.content : "",
+            type: link ? "link" : "text",
+            date: moment().format("lll"),
+          },
+        ],
         timestamp: firestore.FieldValue.serverTimestamp(),
         date: moment().format("lll"),
         author: {
@@ -128,13 +162,14 @@ class Chat extends React.Component {
     this.setState({ userTyping: true });
     const { selectedChannel, user } = this.props;
     channelService.addUserTyping(selectedChannel.id, user, true);
-    let input = e.target.value;
-    this.setState({ input: input });
+    const link = validateUrl(e.target.value);
+
+    this.setState({ message: { content: e.target.value }, link: link[1] });
   };
 
   submitMessage = (e) => {
     const { selectedChannel, user } = this.props;
-    const { messages } = this.state;
+    const { messages, link } = this.state;
     if (e.key === "Enter") {
       const lastMsg = messages[messages.length - 1];
       const previousTime =
@@ -158,7 +193,9 @@ class Chat extends React.Component {
           .update(
             {
               content: firestore.FieldValue.arrayUnion({
-                message: this.state.input,
+                message: this.state.message.content,
+                url: link ? this.state.message.content : "",
+                type: link ? "link" : "text",
                 date: moment().format("lll"),
               }),
               timestamp: firestore.FieldValue.serverTimestamp(),
@@ -171,11 +208,13 @@ class Chat extends React.Component {
             },
             { merge: true }
           );
-        this.setState({ input: "" });
+
+        this.setState({ message: { content: "" } });
         channelService.addUserTyping(selectedChannel.id, user, false);
         return;
       }
-      this.setState({ input: "" });
+
+      this.setState({ message: { content: "" } });
       channelService.addUserTyping(selectedChannel.id, user, false);
       return this.addMessageToChannel();
     }
@@ -196,17 +235,28 @@ class Chat extends React.Component {
     }, []);
     if (typers.length > 2) headline = "Holy cow! Too many people to count!";
     else {
-      headline = typers.length ? typers.join(", ") + " are typing..." : "";
+      const join = typers.length === 1 ? ' is' : ' are';
+      headline = typers.length ? typers.join(", ") + `${join} typing...` : "";
     }
     return (
-      <span style={{ fontSize: 12, fontWeight: 600, marginLeft: 8 }}>
+      <span id="user-typing" style={{ fontSize: 11, fontWeight: 600, marginLeft: 8 }}>
         {headline}
       </span>
     );
   };
+  fileHandler = (e) => {
+    const { message } = this.state;
+    this.setState({ message: { ...message, type: "img" } });
+  };
+
+  upload = () => {
+    document.getElementById("upload-message-img").click();
+  };
+
+  buildImg = () => {};
 
   render() {
-    const { messages, input } = this.state;
+    const { messages, message } = this.state;
     const { classes, selectedChannel } = this.props;
     return (
       <div
@@ -265,7 +315,13 @@ class Chat extends React.Component {
                       ""
                     )}
                   </Grid>
-                  <Paper
+                  <ChatItem
+                    message={msg}
+                    messageRef={
+                      i === messages.length - 1 ? this.messageRef : null
+                    }
+                  />
+                  {/* <Paper
                     elevation={0}
                     ref={i === messages.length - 1 ? this.messageRef : null}
                     style={{
@@ -326,11 +382,14 @@ class Chat extends React.Component {
                           <div>
                             {" "}
                             {content.message} <br />
+                            <div>
+                           
+                            </div>
                           </div>
                         ))}
                       </div>
                     </Typography>
-                  </Paper>
+                  </Paper> */}
                 </div>
               ))
             ) : (
@@ -376,7 +435,29 @@ class Chat extends React.Component {
         </div>
 
         <TextField
-          InputProps={{ classes: { input: classes.input2 } }}
+          InputProps={{
+            startAdornment: (
+              <div style={{ display: "grid" }}>
+                <button className={classes.btn} id="plus" onClick={this.upload}>
+                  <FontAwesomeIcon
+                    className={classes.icon}
+                    icon={faPlusCircle}
+                  ></FontAwesomeIcon>
+                </button>
+                <input
+                  id="upload-message-img"
+                  hidden
+                  type="file"
+                  onChange={this.fileHandler}
+                />
+              </div>
+            ),
+            classes: {
+              input: this.state.link
+                ? clsx([classes.input2, classes.link])
+                : classes.input2,
+            },
+          }}
           variant="outlined"
           placeholder={`Message #${
             selectedChannel ? selectedChannel.name : ""
@@ -384,7 +465,7 @@ class Chat extends React.Component {
           autoFocus
           onKeyPress={this.submitMessage}
           onChange={this.handleTyping}
-          value={input}
+          value={message.content}
           className={classes.input}
         />
       </div>
