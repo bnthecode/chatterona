@@ -10,7 +10,7 @@ const useStyles = makeStyles(() => ({
       top: 46,
     width: 200,
     height: 'calc(100vh - 48px)',
-    backgroundColor: "#23272a",
+    backgroundColor: "#2f3136",
   },
 }));
 

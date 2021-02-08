@@ -1,4 +1,5 @@
-import $ from "jquery";
+import axios from "axios";
+import isImageUrl from "is-image-url";
 
 export const truncateString = (str, num) => {
   return str.length <= num ? str : str.slice(0, num) + "...";
@@ -20,54 +21,34 @@ export const determineMobile = () => {
   });
 };
 
-// var buffer = 20; //scroll bar buffer
-// var iframe = document.getElementById("ifm");
-
-// function pageY(elem) {
-//   return elem.offsetParent
-//     ? elem.offsetTop + pageY(elem.offsetParent)
-//     : elem.offsetTop;
-// }
-
-// function resizeIframe() {
-//   var height = document.documentElement.clientHeight;
-//   height -= pageY(document.getElementById("ifm")) + buffer;
-//   height = height < 0 ? 0 : height;
-//   document.getElementById("ifm").style.height = height + "px";
-// }
-
-// // .onload doesn't work with IE8 and older.
-// if (iframe) {
-//     console.log('found')
-//   if (iframe.attachEvent) {
-//     iframe.attachEvent("onload", resizeIframe);
-//   } else {
-//     iframe.onload = resizeIframe;
-//   }
-// }
-
-// window.onresize = resizeIframe;
+export const validateUrl = (url) => {
+  var pattern = new RegExp(
+    "^(https?:\\/\\/)?" + // protocol
+      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+      "(\\#[-a-z\\d_]*)?$",
+    "i"
+  ); // fragment locator
+  return !!pattern.test(url);
+};
 
 
-export const validateUrl = (textToCheck) => {
-    var expression = /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~@:%]*)*(#[\w\-]*)?(\?[^\s]*)?/gi;
-var regex = new RegExp(expression);
-var match = ''; var splitText = []; var startIndex = 0;
-while ((match = regex.exec(textToCheck)) != null) {
-        
-   splitText.push({text: textToCheck.substr(startIndex, (match.index - startIndex)), type: 'text'});
-               
-   var cleanedLink = textToCheck.substr(match.index, (match[0].length));
-   cleanedLink = cleanedLink.replace(/^https?:\/\//,'');
-   splitText.push({text: cleanedLink, type: 'link'});
-                
-   startIndex = match.index + (match[0].length);               
-}
-if (startIndex < textToCheck.length) splitText.push({text: textToCheck.substr(startIndex), type: 'text'});
-return splitText;
-}
+export const checkContentType = (url) => {
+ const isUrl = validateUrl(url)
+  return { url: isUrl ? url : '', type: isUrl ? 'link' : 'text' };
+};
 
 
+export const checkUrlsContent = async (url) => {
 
+  try { 
+  const response = await axios.get(url);
+    return response.headers['content-type'] 
+  }
+  catch {
+    return 'link'
+  }
 
-
+ }; 

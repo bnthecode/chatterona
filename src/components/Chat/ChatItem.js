@@ -1,18 +1,30 @@
 import { Paper, Typography } from "@material-ui/core";
 import React from "react";
 import ChatItemImage from "./ChatItemImage";
+import ChatItemLink from "./ChatItemLink";
+import ChatItemText from "./ChatItemText";
 
 const ChatItem = ({ messageRef, message }) => {
+  console.log('this is the message recieved', message)
+  const components = {
+    image: ChatItemImage,
+    link: ChatItemLink,
+    text: ChatItemText,
+  };
+
   const determineMessageType = (content) => {
-      console.log(content)
-    switch (content.type) {
-      case "text":
-        return <div>{content.message}</div>;
-        
-      case "link":
-        return <ChatItemImage url={content.url} />;
-      default: return <div style={{ }}>{content.message}</div>;
-    }
+    const isImage = content.type ? content.type.includes("image") : false;
+    const isText = content.type === "text";
+    const isExternalLink = content.type === "link";
+    const component = [
+      { name: "image", active: isImage },
+      { name: "text", active: isText },
+      { name: "link", active: isExternalLink },
+    ].find((n) => n.active);
+ 
+    const Component = component ? components[component.name] : components["text"];
+
+    return <Component content={content} />;
   };
   return (
     <div>
@@ -28,7 +40,8 @@ const ChatItem = ({ messageRef, message }) => {
           padding: 14,
           backgroundColor: "transparent",
           overflowY: "auto",
-          width: "80%",
+          width: "90%",
+          position: "relative",
         }}
       >
         <Paper
@@ -46,16 +59,17 @@ const ChatItem = ({ messageRef, message }) => {
           style={{
             fontSize: 14,
             marginLeft: 22,
-
+            width: "100%",
             color: "white",
             fontWeight: 600,
           }}
         >
           <Typography
             style={{
-              fontSize: 12,
+              fontSize: '1rem',
               color: "white",
-              fontWeight: 800,
+              fontWeight: 500,
+              lineHeight: '1.375rem'
             }}
           >
             {" "}
@@ -72,8 +86,11 @@ const ChatItem = ({ messageRef, message }) => {
               {message.date}
             </span>
           </Typography>
-          <div style={{ marginTop: 4 }}>
-            {message.content.map((content) => <div style={{ position: 'relative'}}>{ determineMessageType(content)}</div>)}
+          <div style={{ marginTop: 4, width: "100%" }}>
+            {message.content.map((content) => (
+              <div>{determineMessageType(content)}</div>
+              // <div>{content.message}</div>
+            ))}
           </div>
         </Typography>
       </Paper>

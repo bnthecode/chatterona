@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 20,
     fontWeight: 700,
     textTransform: "none",
-    color: "#20b673",
+    color: "white",
     backgroundColor: theme.palette.secondary.main,
     "&:hover": {
       backgroundColor: "#4f4f4f",

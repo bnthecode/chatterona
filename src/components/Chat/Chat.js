@@ -8,11 +8,11 @@ import db, { firestore } from "../../firebase";
 import channelService from "../../services/channel-service";
 import FileInput from "../FileInput";
 import "../../utilities";
-import { validateUrl } from "../../utilities";
+import { checkContentType, checkUrlsContent } from "../../utilities";
 import clsx from "clsx";
 import ChatItem from "./ChatItem";
 
-const styles = () => ({
+const styles = (theme) => ({
   "@global": {
     "*::-webkit-scrollbar-thumb": {
       display: "none",
@@ -39,20 +39,38 @@ const styles = () => ({
   },
 
   input2: {
-    height: 14,
+    height: 16,
+    fontSize: "1rem",
     borderRadius: 8,
     borderWidth: 0,
+    outline: 0,
     "&::placeholder": {
       color: "#fff",
     },
-    color: "white",
+    "&:focus": {
+      outline: 0,
+    },
+    color: "#dcddde",
+  },
+  cssOutlinedInput: {
+    "&$cssFocused $notchedOutline": {
+      borderColor: `${theme.palette.primary.main} !important`,
+    },
+  },
+
+  cssFocused: {},
+
+  notchedOutline: {
+    borderWidth: "1px",
+    borderColor: "#40444b !important",
   },
   input: {
-    backgroundColor: "#3a4146",
+    backgroundColor: "#40444b",
     width: "calc(100% - 30px)",
     position: "absolute",
     bottom: 0,
     borderRadius: 8,
+    color: "#dcddde",
   },
   userTypings: {
     width: 400,
@@ -72,7 +90,8 @@ const styles = () => ({
     },
   },
   icon: {
-    color: "lightgrey",
+    color: "#dcddde",
+    fontWeight: 400,
     fontSize: 24,
     marginRight: 16,
   },
@@ -124,6 +143,7 @@ class Chat extends React.Component {
     db.collection("channels")
       .doc(channelId)
       .onSnapshot((snapshot) => {
+        
         this.setState({ usersTyping: snapshot.data().usersTyping });
       });
   };
@@ -132,9 +152,11 @@ class Chat extends React.Component {
 
   addMessageToChannel = async () => {
     this.setState({ userTyping: false });
-    const { message, link } = this.state;
+    const {
+      message: { content = "", url = "", type = "" },
+    } = this.state;
+    const urlType = url.length ? await checkUrlsContent(url) : type;
     const { selectedChannel, user } = this.props;
-
     await db
       .collection("channels")
       .doc(selectedChannel.id)
@@ -142,9 +164,9 @@ class Chat extends React.Component {
       .add({
         content: [
           {
-            message: this.state.message.content,
-            url: link ? this.state.message.content : "",
-            type: link ? "link" : "text",
+            message: content,
+            url: url || "",
+            type: urlType,
             date: moment().format("lll"),
           },
         ],
@@ -162,14 +184,21 @@ class Chat extends React.Component {
     this.setState({ userTyping: true });
     const { selectedChannel, user } = this.props;
     channelService.addUserTyping(selectedChannel.id, user, true);
-    const link = validateUrl(e.target.value);
-
-    this.setState({ message: { content: e.target.value }, link: link[1] });
+    const { url, type } = checkContentType(e.target.value);
+    this.setState({
+      message: { ...this.state.message, content: e.target.value, type, url },
+    });
   };
 
-  submitMessage = (e) => {
+  submitMessage = async (e) => {
     const { selectedChannel, user } = this.props;
-    const { messages, link } = this.state;
+    const {
+      messages,
+      message: { content = "", url = "", type = "" },
+      message,
+    } = this.state;
+    const urlType = url.length ? await checkUrlsContent(url) : type;
+
     if (e.key === "Enter") {
       const lastMsg = messages[messages.length - 1];
       const previousTime =
@@ -193,9 +222,9 @@ class Chat extends React.Component {
           .update(
             {
               content: firestore.FieldValue.arrayUnion({
-                message: this.state.message.content,
-                url: link ? this.state.message.content : "",
-                type: link ? "link" : "text",
+                message: message.content,
+                url: url,
+                type: urlType,
                 date: moment().format("lll"),
               }),
               timestamp: firestore.FieldValue.serverTimestamp(),
@@ -214,9 +243,10 @@ class Chat extends React.Component {
         return;
       }
 
-      this.setState({ message: { content: "" } });
+
       channelService.addUserTyping(selectedChannel.id, user, false);
-      return this.addMessageToChannel();
+       await this.addMessageToChannel();
+       this.setState({ message: { content: "" } });
     }
   };
 
@@ -235,11 +265,14 @@ class Chat extends React.Component {
     }, []);
     if (typers.length > 2) headline = "Holy cow! Too many people to count!";
     else {
-      const join = typers.length === 1 ? ' is' : ' are';
+      const join = typers.length === 1 ? " is" : " are";
       headline = typers.length ? typers.join(", ") + `${join} typing...` : "";
     }
     return (
-      <span id="user-typing" style={{ fontSize: 11, fontWeight: 600, marginLeft: 8 }}>
+      <span
+        id="user-typing"
+        style={{ fontSize: 11, fontWeight: 600, marginLeft: 8 }}
+      >
         {headline}
       </span>
     );
@@ -256,7 +289,12 @@ class Chat extends React.Component {
   buildImg = () => {};
 
   render() {
-    const { messages, message } = this.state;
+    const {
+      messages,
+      message,
+      message: { content, type, url },
+    } = this.state;
+    console.log(messages);
     const { classes, selectedChannel } = this.props;
     return (
       <div
@@ -321,75 +359,6 @@ class Chat extends React.Component {
                       i === messages.length - 1 ? this.messageRef : null
                     }
                   />
-                  {/* <Paper
-                    elevation={0}
-                    ref={i === messages.length - 1 ? this.messageRef : null}
-                    style={{
-                      minHeight: 40,
-
-                      display: "flex",
-                      justifyContent: "flex-start",
-                      flexDirection: "row",
-                      padding: 14,
-                      backgroundColor: "transparent",
-                      overflowY: "auto",
-                      width: "80%",
-                    }}
-                  >
-                    <Paper
-                      style={{
-                        backgroundImage: `url(${
-                          msg.author ? msg.author.photoURL : ""
-                        })`,
-                        borderRadius: 20,
-                        backgroundSize: "contain",
-                        height: 40,
-                        width: 40,
-                      }}
-                    ></Paper>
-                    <Typography
-                      style={{
-                        fontSize: 14,
-                        marginLeft: 22,
-
-                        color: "white",
-                        fontWeight: 600,
-                      }}
-                    >
-                      <Typography
-                        style={{
-                          fontSize: 12,
-                          color: "white",
-                          fontWeight: 800,
-                        }}
-                      >
-                        {" "}
-                        {msg.author.name}
-                        <span
-                          style={{
-                            fontSize: 10,
-
-                            color: "grey",
-                            fontWeight: 500,
-                            marginLeft: 16,
-                          }}
-                        >
-                          {msg.date}
-                        </span>
-                      </Typography>
-                      <div style={{ marginTop: 4 }}>
-                        {msg.content.map((content) => (
-                          <div>
-                            {" "}
-                            {content.message} <br />
-                            <div>
-                           
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </Typography>
-                  </Paper> */}
                 </div>
               ))
             ) : (
@@ -436,6 +405,15 @@ class Chat extends React.Component {
 
         <TextField
           InputProps={{
+            classes: {
+              root: classes.cssOutlinedInput,
+              input:
+                url && type !== "text"
+                  ? clsx([classes.input2, classes.link])
+                  : classes.input2,
+              focused: classes.cssFocused,
+              notchedOutline: classes.notchedOutline,
+            },
             startAdornment: (
               <div style={{ display: "grid" }}>
                 <button className={classes.btn} id="plus" onClick={this.upload}>
@@ -452,12 +430,14 @@ class Chat extends React.Component {
                 />
               </div>
             ),
-            classes: {
-              input: this.state.link
-                ? clsx([classes.input2, classes.link])
-                : classes.input2,
-            },
+            // classes: {
+            //   input:
+            //     url && type !== 'text'
+            //       ? clsx([classes.input2, classes.link])
+            //       : classes.input2,
+            // },
           }}
+          style={{ fontSize: "24px" }}
           variant="outlined"
           placeholder={`Message #${
             selectedChannel ? selectedChannel.name : ""

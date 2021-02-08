@@ -15,7 +15,7 @@ const ChannelHeader = ({ serverName, toggleHeaderOptions }) => {
         height: 46,
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: "#23272a",
+        backgroundColor: "#2f3136",
         borderBottom: "1px solid #1e1e1e",
         paddingLeft: 18,
       }}
