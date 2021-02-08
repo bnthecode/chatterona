@@ -1,23 +1,25 @@
-
 import { makeStyles } from "@material-ui/core";
-import axios from "axios";
-
-
 
 const useStyles = makeStyles(() => ({
-    iframe: {
-        height: 200,
-        width: 200
-    }
-}))
+  iframe: {
+    height: 200,
+    width: 200,
+  },
+  link: {
+    display: "flex",
+    marginTop: 8,
+    flexDirection: "column",
+    height: 400,
+    width: 400,
+    backgroundColor: "#2f3136",
+  },
+}));
 const ChatItemLink = ({ content }) => {
-    const classes = useStyles()
+  const classes = useStyles();
   const meta = new URL(content.url);
 
-
   return (
-    <div style={{ display: "flex", marginTop: 8, flexDirection: "column", height: 400, width: 400, backgroundColor: '#2f3136' }}>
-        
+    <div className={classes.link}>
       <a
         tabindex="0"
         href={meta.href}
@@ -32,9 +34,8 @@ const ChatItemLink = ({ content }) => {
           maxHeight: "400px",
         }}
       >
-        {meta.host.split('.')[1]}
+        {meta.host.split(".")[1]}
       </a>
-
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { Divider, makeStyles } from "@material-ui/core";
 import Drawer from "../Drawer";
 import AddIcon from "@material-ui/icons/Add";
 import VideogameAssetIcon from "@material-ui/icons/VideogameAsset";
-import { channelService, serverService, userService } from "../../services";
+import { channelService, serverService } from "../../services";
 import { useEffect, useState } from "react";
 
 import ServerListItem from "./ServerListItem";

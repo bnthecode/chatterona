@@ -1,12 +1,11 @@
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core";
+import { Grid, Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import moment from "moment";
 import React from "react";
 import db, { firestore } from "../../firebase";
 import channelService from "../../services/channel-service";
-import FileInput from "../FileInput";
 import "../../utilities";
 import { checkContentType, checkUrlsContent } from "../../utilities";
 import clsx from "clsx";
@@ -194,7 +193,7 @@ class Chat extends React.Component {
     const { selectedChannel, user } = this.props;
     const {
       messages,
-      message: { content = "", url = "", type = "" },
+      message: { url = "", type = "" },
       message,
     } = this.state;
     const urlType = url.length ? await checkUrlsContent(url) : type;
@@ -292,9 +291,8 @@ class Chat extends React.Component {
     const {
       messages,
       message,
-      message: { content, type, url },
+      message: { type, url },
     } = this.state;
-    console.log(messages);
     const { classes, selectedChannel } = this.props;
     return (
       <div

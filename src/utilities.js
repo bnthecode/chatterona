@@ -1,5 +1,4 @@
 import axios from "axios";
-import isImageUrl from "is-image-url";
 
 export const truncateString = (str, num) => {
   return str.length <= num ? str : str.slice(0, num) + "...";

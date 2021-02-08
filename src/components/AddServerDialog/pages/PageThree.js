@@ -10,7 +10,6 @@ import {
 import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import FileInput from "../../FileInput";
 
 const useStyles = makeStyles((theme) => ({
   title: {
