@@ -12,6 +12,32 @@ code {
     monospace;
 }
 
-input[type="file"] {
-  display: none;
+#user-typing {
+  position: relative;
+  /* text-transform: uppercase; */
+  letter-spacing: 2px;
+  font-weight: 900;
+  text-decoration: none;
+  color: #fff;
+  display: inline-block;
+  background-size: 120% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+  -ms-background-clip: text;
+  -ms-text-fill-color: transparent;
+  background-clip: text;
+  /* text-fill-color: transparent; */
+  background-color: white;
+  animation: 1.5s shake infinite;
+}
+
+@keyframes shake {
+  0% { transform: skewX(-10deg); }
+  25% { transform: skewX(10deg); }
+  50% { transform: skewX(-10deg); }
+  75% { transform: skewX(10deg); }
+  100% { transform: skewX(-10deg); }
+
 }

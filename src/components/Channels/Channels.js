@@ -23,13 +23,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 const useStyles = makeStyles(() => ({
-  drawer: { backgroundColor: "#23272a", width: "310px" },
+  drawer: { backgroundColor: "#2f3136", width: "310px" },
   wrapper: { paddingLeft: "72px" },
   divider: { width: "100%", height: 1, backgroundColor: "#1e1e1e" },
   list: { width: "100%", margin: 4 },
   paper: {
     position: "absolute",
-    backgroundColor: "#282828",
+    backgroundColor: "#292b2f",
     bottom: 0,
     padding: 8,
     height: 52,

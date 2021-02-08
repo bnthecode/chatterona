@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     width: "calc(100% - 16px)",
     marginBottom: 4,
     "&:hover": {
-      backgroundColor: "#2f3438",
+      backgroundColor: "#23272a",
       color: "#fff",
     },
     "&:focus": {
