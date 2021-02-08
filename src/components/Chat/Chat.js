@@ -1,11 +1,17 @@
+import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Grid, Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import moment from "moment";
 import React from "react";
 import db, { firestore } from "../../firebase";
 import channelService from "../../services/channel-service";
+import "../../utilities";
+import { checkContentType, checkUrlsContent } from "../../utilities";
+import clsx from "clsx";
+import ChatItem from "./ChatItem";
 
-const styles = () => ({
+const styles = (theme) => ({
   "@global": {
     "*::-webkit-scrollbar-thumb": {
       display: "none",
@@ -32,20 +38,38 @@ const styles = () => ({
   },
 
   input2: {
-    height: 14,
+    height: 16,
+    fontSize: "1rem",
     borderRadius: 8,
     borderWidth: 0,
+    outline: 0,
     "&::placeholder": {
       color: "#fff",
     },
-    color: "white",
+    "&:focus": {
+      outline: 0,
+    },
+    color: "#dcddde",
+  },
+  cssOutlinedInput: {
+    "&$cssFocused $notchedOutline": {
+      borderColor: `${theme.palette.primary.main} !important`,
+    },
+  },
+
+  cssFocused: {},
+
+  notchedOutline: {
+    borderWidth: "1px",
+    borderColor: "#40444b !important",
   },
   input: {
-    backgroundColor: "#3a4146",
+    backgroundColor: "#40444b",
     width: "calc(100% - 30px)",
     position: "absolute",
     bottom: 0,
     borderRadius: 8,
+    color: "#dcddde",
   },
   userTypings: {
     width: 400,
@@ -53,6 +77,25 @@ const styles = () => ({
     bottom: 60,
     borderRadius: 8,
     color: "white",
+  },
+  btn: {
+    cursor: "pointer",
+    border: "none",
+    backgroundColor: "transparent",
+    "&:focus": {
+      outline: "none",
+      border: "none",
+      backgroundColor: "transparent",
+    },
+  },
+  icon: {
+    color: "#dcddde",
+    fontWeight: 400,
+    fontSize: 24,
+    marginRight: 16,
+  },
+  link: {
+    color: "#2196f3",
   },
 });
 
@@ -64,7 +107,9 @@ class Chat extends React.Component {
   state = {
     messages: [],
     usersTyping: {},
-    input: "",
+    message: {
+      content: "",
+    },
   };
 
   componentDidMount = () => {
@@ -97,6 +142,7 @@ class Chat extends React.Component {
     db.collection("channels")
       .doc(channelId)
       .onSnapshot((snapshot) => {
+        
         this.setState({ usersTyping: snapshot.data().usersTyping });
       });
   };
@@ -105,15 +151,24 @@ class Chat extends React.Component {
 
   addMessageToChannel = async () => {
     this.setState({ userTyping: false });
-    const { input } = this.state;
+    const {
+      message: { content = "", url = "", type = "" },
+    } = this.state;
+    const urlType = url.length ? await checkUrlsContent(url) : type;
     const { selectedChannel, user } = this.props;
-
     await db
       .collection("channels")
       .doc(selectedChannel.id)
       .collection("messages")
       .add({
-        content: [{ message: input, date: moment().format("lll") }],
+        content: [
+          {
+            message: content,
+            url: url || "",
+            type: urlType,
+            date: moment().format("lll"),
+          },
+        ],
         timestamp: firestore.FieldValue.serverTimestamp(),
         date: moment().format("lll"),
         author: {
@@ -128,13 +183,21 @@ class Chat extends React.Component {
     this.setState({ userTyping: true });
     const { selectedChannel, user } = this.props;
     channelService.addUserTyping(selectedChannel.id, user, true);
-    let input = e.target.value;
-    this.setState({ input: input });
+    const { url, type } = checkContentType(e.target.value);
+    this.setState({
+      message: { ...this.state.message, content: e.target.value, type, url },
+    });
   };
 
-  submitMessage = (e) => {
+  submitMessage = async (e) => {
     const { selectedChannel, user } = this.props;
-    const { messages } = this.state;
+    const {
+      messages,
+      message: { url = "", type = "" },
+      message,
+    } = this.state;
+    const urlType = url.length ? await checkUrlsContent(url) : type;
+
     if (e.key === "Enter") {
       const lastMsg = messages[messages.length - 1];
       const previousTime =
@@ -158,7 +221,9 @@ class Chat extends React.Component {
           .update(
             {
               content: firestore.FieldValue.arrayUnion({
-                message: this.state.input,
+                message: message.content,
+                url: url,
+                type: urlType,
                 date: moment().format("lll"),
               }),
               timestamp: firestore.FieldValue.serverTimestamp(),
@@ -171,13 +236,16 @@ class Chat extends React.Component {
             },
             { merge: true }
           );
-        this.setState({ input: "" });
+
+        this.setState({ message: { content: "" } });
         channelService.addUserTyping(selectedChannel.id, user, false);
         return;
       }
-      this.setState({ input: "" });
+
+
       channelService.addUserTyping(selectedChannel.id, user, false);
-      return this.addMessageToChannel();
+       await this.addMessageToChannel();
+       this.setState({ message: { content: "" } });
     }
   };
 
@@ -196,17 +264,35 @@ class Chat extends React.Component {
     }, []);
     if (typers.length > 2) headline = "Holy cow! Too many people to count!";
     else {
-      headline = typers.length ? typers.join(", ") + " are typing..." : "";
+      const join = typers.length === 1 ? " is" : " are";
+      headline = typers.length ? typers.join(", ") + `${join} typing...` : "";
     }
     return (
-      <span style={{ fontSize: 12, fontWeight: 600, marginLeft: 8 }}>
+      <span
+        id="user-typing"
+        style={{ fontSize: 11, fontWeight: 600, marginLeft: 8 }}
+      >
         {headline}
       </span>
     );
   };
+  fileHandler = (e) => {
+    const { message } = this.state;
+    this.setState({ message: { ...message, type: "img" } });
+  };
+
+  upload = () => {
+    document.getElementById("upload-message-img").click();
+  };
+
+  buildImg = () => {};
 
   render() {
-    const { messages, input } = this.state;
+    const {
+      messages,
+      message,
+      message: { type, url },
+    } = this.state;
     const { classes, selectedChannel } = this.props;
     return (
       <div
@@ -265,72 +351,12 @@ class Chat extends React.Component {
                       ""
                     )}
                   </Grid>
-                  <Paper
-                    elevation={0}
-                    ref={i === messages.length - 1 ? this.messageRef : null}
-                    style={{
-                      minHeight: 40,
-
-                      display: "flex",
-                      justifyContent: "flex-start",
-                      flexDirection: "row",
-                      padding: 14,
-                      backgroundColor: "transparent",
-                      overflowY: "auto",
-                      width: "80%",
-                    }}
-                  >
-                    <Paper
-                      style={{
-                        backgroundImage: `url(${
-                          msg.author ? msg.author.photoURL : ""
-                        })`,
-                        borderRadius: 20,
-                        backgroundSize: "contain",
-                        height: 40,
-                        width: 40,
-                      }}
-                    ></Paper>
-                    <Typography
-                      style={{
-                        fontSize: 14,
-                        marginLeft: 22,
-
-                        color: "white",
-                        fontWeight: 600,
-                      }}
-                    >
-                      <Typography
-                        style={{
-                          fontSize: 12,
-                          color: "white",
-                          fontWeight: 800,
-                        }}
-                      >
-                        {" "}
-                        {msg.author.name}
-                        <span
-                          style={{
-                            fontSize: 10,
-
-                            color: "grey",
-                            fontWeight: 500,
-                            marginLeft: 16,
-                          }}
-                        >
-                          {msg.date}
-                        </span>
-                      </Typography>
-                      <div style={{ marginTop: 4 }}>
-                        {msg.content.map((content) => (
-                          <div>
-                            {" "}
-                            {content.message} <br />
-                          </div>
-                        ))}
-                      </div>
-                    </Typography>
-                  </Paper>
+                  <ChatItem
+                    message={msg}
+                    messageRef={
+                      i === messages.length - 1 ? this.messageRef : null
+                    }
+                  />
                 </div>
               ))
             ) : (
@@ -376,7 +402,40 @@ class Chat extends React.Component {
         </div>
 
         <TextField
-          InputProps={{ classes: { input: classes.input2 } }}
+          InputProps={{
+            classes: {
+              root: classes.cssOutlinedInput,
+              input:
+                url && type !== "text"
+                  ? clsx([classes.input2, classes.link])
+                  : classes.input2,
+              focused: classes.cssFocused,
+              notchedOutline: classes.notchedOutline,
+            },
+            startAdornment: (
+              <div style={{ display: "grid" }}>
+                <button className={classes.btn} id="plus" onClick={this.upload}>
+                  <FontAwesomeIcon
+                    className={classes.icon}
+                    icon={faPlusCircle}
+                  ></FontAwesomeIcon>
+                </button>
+                <input
+                  id="upload-message-img"
+                  hidden
+                  type="file"
+                  onChange={this.fileHandler}
+                />
+              </div>
+            ),
+            // classes: {
+            //   input:
+            //     url && type !== 'text'
+            //       ? clsx([classes.input2, classes.link])
+            //       : classes.input2,
+            // },
+          }}
+          style={{ fontSize: "24px" }}
           variant="outlined"
           placeholder={`Message #${
             selectedChannel ? selectedChannel.name : ""
@@ -384,7 +443,7 @@ class Chat extends React.Component {
           autoFocus
           onKeyPress={this.submitMessage}
           onChange={this.handleTyping}
-          value={input}
+          value={message.content}
           className={classes.input}
         />
       </div>

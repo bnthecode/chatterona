@@ -3,7 +3,7 @@ import AppRouter from "./components/Router";
 
 function App({ user }) {
   return (
-    <div style={{ backgroundColor: "#2c2f33", height: "100vh", width: "100%" }}>
+    <div style={{ backgroundColor: "#36393f", height: "100vh", width: "100%" }}>
       <AppRouter user={user} />
     </div>
   );

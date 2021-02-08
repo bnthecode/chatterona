@@ -3,12 +3,16 @@ import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
   serverListItem: {
+    transition: "all .5s",
     height: 44,
     width: 44,
     minHeight: 40,
-    color: "#20b673",
+    color: "#43b581",
     borderRadius: 22,
-    backgroundSize: "contain",
+    // backgroundSize: '44px 44px',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    objectFit: 'contain',
     backgroundColor: theme.palette.secondary.dark,
     margin: 6,
     display: "grid",
@@ -16,11 +20,17 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     cursor: "pointer",
     "&:hover": {
-      transition: "all .5s",
       color: "white",
+      backgroundColor: '#43b581',
       borderRadius: "35%",
     },
   },
+  selected: {
+    transition: "all .5s",
+    color: "white",
+    backgroundColor: '#43b581',
+    borderRadius: "35%",
+  }
 }));
 
 const ServerListItem = ({
@@ -41,9 +51,9 @@ const ServerListItem = ({
       <Tooltip placement="right" title={title}>
         <Paper
         onClick={() => setSelected(id)}
-          className={clsx([
-            classes.serverListItem,
-          ])}
+          className={clsx( selected ? 
+            [classes.serverListItem, classes.selected] : [classes.serverListItem]
+          )}
           {...listItemProps}
         >
           {children}
