@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useEffect, useState } from "react";
-import { channelService } from "../../services";
+import channelService from "../../http/channels-http";
 import ChannelHeader from "./ChannelHeader";
 import ChannelListItem from "./ChannelListItem";
 import CreateChannelDialog from "./CreateChannelDialog";
@@ -21,6 +21,7 @@ import {
   faPlus,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
+import db from "../../firebase";
 
 const useStyles = makeStyles(() => ({
   drawer: { backgroundColor: "#2f3136", width: "310px" },
@@ -71,7 +72,12 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
+const Channels = ({
+  selectedServer = {},
+  selectedChannel = {},
+  setChannel,
+  user,
+}) => {
   const classes = useStyles();
   const [channels, setChannels] = useState([]);
   const [headerOptions, showHeaderOptions] = useState(false);
@@ -81,20 +87,20 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   });
   const [showChannelDialog, setChannelDialogOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchChannels = async () => {
-      if (selectedServer.id) {
-        const channels = await channelService.getChannels(selectedServer.id);
-        setChannels(channels);
-        if(channels[0]){
-        setChannel(channels[0]);
-        setDropdownsOpen({ ...openDropdowns, [channels[0].type]: true})
-        }
+  const handleChannelEvents = (channels) => {
+    if (channels) {
+      setChannels(channels);
+    
+    }
+  };
 
-      }
-    };
-    fetchChannels();
-  }, [selectedServer.id]);// eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const { id } = selectedServer;
+    if (id) {
+      channelService.registerChannelsListener(id, handleChannelEvents);
+    }
+  }, [selectedServer.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleDropdown = (type) => {
     setDropdownsOpen({
@@ -104,11 +110,8 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
   };
 
   const handleAddChannel = async (channel) => {
-    await channelService.addChannel(selectedServer.id, channel);
-    const channels = await channelService.getChannels(selectedServer.id);
-    setChannels(channels);
-    setChannel(channels.find(chnl => chnl.name === channel.name));
-    setChannelDialogOpen({ open: false})
+    await channelService.createChannel(selectedServer.id, channel);
+    setChannelDialogOpen({ open: false });
   };
 
   const toggleHeaderOptions = () => showHeaderOptions(!headerOptions);
@@ -129,20 +132,23 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
               iconRight={{
                 icon: faPlus,
                 title: "Create Channel",
-                onClick: () => setChannelDialogOpen({type: 'text', open: true}),
+                onClick: () =>
+                  setChannelDialogOpen({ type: "text", open: true }),
               }}
               title="TEXT CHANNELS"
-              titleStyle={{ fontSize: 12}}
+              titleStyle={{ fontSize: 12 }}
               onClick={() => toggleDropdown("text")}
             />
             <Collapse in={openDropdowns["text"]} timeout={200}>
               {channels
                 ? channels
-                    .filter((chnl) => chnl.type === 'text')
+                    .filter((chnl) => chnl.type === "text")
                     .map((chnl) => (
                       <ChannelListItem
                         selected={chnl.id === selectedChannel.id}
-                        iconLeft={chnl.type === 'voice' ? faVolumeUp : faHashtag}
+                        iconLeft={
+                          chnl.type === "voice" ? faVolumeUp : faHashtag
+                        }
                         onClick={() => setChannel(chnl)}
                         title={chnl.name}
                       />
@@ -155,20 +161,23 @@ const Channels = ({ selectedServer, setChannel, selectedChannel, user }) => {
               iconRight={{
                 icon: faPlus,
                 title: "Create Channel",
-                onClick: () => setChannelDialogOpen({type: 'voice', open: true}),
+                onClick: () =>
+                  setChannelDialogOpen({ type: "voice", open: true }),
               }}
               title="VOICE CHANNELS"
-              titleStyle={{ fontSize: 12}}
+              titleStyle={{ fontSize: 12 }}
               onClick={() => toggleDropdown("voice")}
             />
             <Collapse in={openDropdowns["voice"]} timeout={200}>
               {channels
                 ? channels
-                .filter((chnl) => chnl.type === 'voice')
+                    .filter((chnl) => chnl.type === "voice")
                     .map((chnl) => (
                       <ChannelListItem
                         selected={chnl.id === selectedChannel.id}
-                        iconLeft={chnl.type === 'voice' ? faVolumeUp : faHashtag}
+                        iconLeft={
+                          chnl.type === "voice" ? faVolumeUp : faHashtag
+                        }
                         onClick={() => setChannel(chnl)}
                         title={chnl.name}
                       />

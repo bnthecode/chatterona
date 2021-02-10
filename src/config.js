@@ -14,6 +14,8 @@ const config = {
         uid: randomKey,
         photoURL: animals[Math.floor(Math.random() * 6)],
         displayName:`Chatterona Bot_${randomKey}`, 
-    }
+    },
+    node_api_base_url: "http://localhost:8080/api",
+
 }
 export default config;

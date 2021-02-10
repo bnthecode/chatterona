@@ -30,7 +30,7 @@ export const validateUrl = (url) => {
       "(\\#[-a-z\\d_]*)?$",
     "i"
   ); // fragment locator
-  return !!pattern.test(url);
+  return !!pattern.test(url) ? 'link' : 'text';
 };
 
 

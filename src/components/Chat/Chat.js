@@ -5,11 +5,16 @@ import { withStyles } from "@material-ui/styles";
 import moment from "moment";
 import React from "react";
 import db, { firestore } from "../../firebase";
-import channelService from "../../services/channel-service";
 import "../../utilities";
-import { checkContentType, checkUrlsContent } from "../../utilities";
+import {
+  checkContentType,
+  checkUrlsContent,
+  validateUrl,
+} from "../../utilities";
 import clsx from "clsx";
 import ChatItem from "./ChatItem";
+import channelService from "../../http/channels-http";
+import messageServices from "../../http/messages-http";
 
 const styles = (theme) => ({
   "@global": {
@@ -107,147 +112,71 @@ class Chat extends React.Component {
   state = {
     messages: [],
     usersTyping: {},
-    message: {
-      content: "",
-    },
+    messageType: "text",
+    message: "",
   };
 
   componentDidMount = () => {
-    const { selectedChannel } = this.props;
-    this.registerChannelListener(selectedChannel.id);
-  };
-
-  componentDidUpdate = (prevProps, prevState) => {
-    const { selectedChannel } = this.props;
-
-    if (prevProps.selectedChannel.id !== selectedChannel.id) {
-      this.registerChannelListener(selectedChannel.id);
+    const { selectedChannel, selectedServer } = this.props;
+    if (selectedChannel.id && selectedServer.id) {
+      this.registerEventListeners(selectedServer.id, selectedChannel.id);
     }
   };
 
-  registerChannelListener = (channelId) => {
-    db.collection("channels")
-      .doc(channelId)
-      .collection("messages")
-      .orderBy("timestamp", "asc")
-      .onSnapshot((snapshot) => {
-        this.setState({
-          messages: snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })),
-        });
-
-        if (this.messageRef && this.messageRef.current) {
-          this.messageRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-      });
-    db.collection("channels")
-      .doc(channelId)
-      .onSnapshot((snapshot) => {
-        
-        this.setState({ usersTyping: snapshot.data().usersTyping });
-      });
+  updateChannel = (data) => {
+    /// when channel gets updated.. typing and others
   };
 
-  updateMessages = (messages) => this.setState({ messages });
+  componentDidUpdate = (prevProps, prevState) => {
+    const { selectedChannel, selectedServer } = this.props;
+    if (prevProps.selectedChannel.id !== selectedChannel.id) {
+      this.registerEventListeners(selectedServer.id, selectedChannel.id);
+    }
+  };
+
+  registerEventListeners = (serverId, channelId) => {
+    channelService.registerChannelListener(
+      serverId,
+      channelId,
+      this.updateChannel
+    );
+    messageServices.registerMessagesListener(
+      serverId,
+      channelId,
+      this.handleMessageEvents
+    );
+  };
+
+  handleMessageEvents = (messages) => {
+    this.setState({ messages });
+    if (this.messageRef && this.messageRef.current) {
+      this.messageRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   addMessageToChannel = async () => {
-    this.setState({ userTyping: false });
-    const {
-      message: { content = "", url = "", type = "" },
-    } = this.state;
-    const urlType = url.length ? await checkUrlsContent(url) : type;
-    const { selectedChannel, user } = this.props;
-    await db
-      .collection("channels")
-      .doc(selectedChannel.id)
-      .collection("messages")
-      .add({
-        content: [
-          {
-            message: content,
-            url: url || "",
-            type: urlType,
-            date: moment().format("lll"),
-          },
-        ],
-        timestamp: firestore.FieldValue.serverTimestamp(),
-        date: moment().format("lll"),
-        author: {
-          photoURL: user.photoURL,
-          name: user.displayName,
-          uid: user.uid,
-        },
-      });
+    const { message } = this.state;
+    this.setState({ userTyping: false, message: "" });
+    const { selectedChannel, selectedServer } = this.props;
+    await messageServices.createMessage(
+      selectedServer.id,
+      selectedChannel.id,
+      message
+    );
   };
 
   handleTyping = (e) => {
     this.setState({ userTyping: true });
-    const { selectedChannel, user } = this.props;
-    channelService.addUserTyping(selectedChannel.id, user, true);
-    const { url, type } = checkContentType(e.target.value);
+    // const { selectedChannel, user } = this.props;
+    // channelService.addUserTyping(selectedChannel.id, user, true);
     this.setState({
-      message: { ...this.state.message, content: e.target.value, type, url },
+      messageType: validateUrl(e.target.value),
+      message: e.target.value,
     });
   };
 
-  submitMessage = async (e) => {
-    const { selectedChannel, user } = this.props;
-    const {
-      messages,
-      message: { url = "", type = "" },
-      message,
-    } = this.state;
-    const urlType = url.length ? await checkUrlsContent(url) : type;
-
-    if (e.key === "Enter") {
-      const lastMsg = messages[messages.length - 1];
-      const previousTime =
-        lastMsg && lastMsg.content.length
-          ? lastMsg.content[lastMsg.content.length - 1].date
-          : null;
-
-      const minutesPassedSincePrev = moment().diff(previousTime, "minutes");
-      // generate new message if user has not sent a message in the last 20 minutes AND
-      // if they are the previous author
-      const addMessageToPrevious =
-        minutesPassedSincePrev < 20 &&
-        lastMsg &&
-        lastMsg.author.uid === user.uid;
-
-      if (addMessageToPrevious) {
-        db.collection("channels")
-          .doc(selectedChannel.id)
-          .collection("messages")
-          .doc(lastMsg.id)
-          .update(
-            {
-              content: firestore.FieldValue.arrayUnion({
-                message: message.content,
-                url: url,
-                type: urlType,
-                date: moment().format("lll"),
-              }),
-              timestamp: firestore.FieldValue.serverTimestamp(),
-              date: moment().format("lll"),
-              author: {
-                photoURL: user.photoURL,
-                name: user.displayName,
-                uid: user.uid,
-              },
-            },
-            { merge: true }
-          );
-
-        this.setState({ message: { content: "" } });
-        channelService.addUserTyping(selectedChannel.id, user, false);
-        return;
-      }
-
-
-      channelService.addUserTyping(selectedChannel.id, user, false);
-       await this.addMessageToChannel();
-       this.setState({ message: { content: "" } });
-    }
-  };
+  submitMessage = ({ key }) =>
+    key === "Enter" ? this.addMessageToChannel() : null;
 
   isNewDay = (currentDate, previousDate) => {
     return !moment(currentDate).isSame(previousDate, "day");
@@ -277,22 +206,17 @@ class Chat extends React.Component {
     );
   };
   fileHandler = (e) => {
-    const { message } = this.state;
-    this.setState({ message: { ...message, type: "img" } });
+    //??
+    // const { message } = this.state;
+    // this.setState({ message: { ...message, type: "img" } });
   };
 
   upload = () => {
-    document.getElementById("upload-message-img").click();
+    // document.getElementById("upload-message-img").click();
   };
 
-  buildImg = () => {};
-
   render() {
-    const {
-      messages,
-      message,
-      message: { type, url },
-    } = this.state;
+    const { messages, message, messageType } = this.state;
     const { classes, selectedChannel } = this.props;
     return (
       <div
@@ -406,7 +330,7 @@ class Chat extends React.Component {
             classes: {
               root: classes.cssOutlinedInput,
               input:
-                url && type !== "text"
+                messageType === "link"
                   ? clsx([classes.input2, classes.link])
                   : classes.input2,
               focused: classes.cssFocused,
@@ -428,12 +352,6 @@ class Chat extends React.Component {
                 />
               </div>
             ),
-            // classes: {
-            //   input:
-            //     url && type !== 'text'
-            //       ? clsx([classes.input2, classes.link])
-            //       : classes.input2,
-            // },
           }}
           style={{ fontSize: "24px" }}
           variant="outlined"
@@ -443,7 +361,7 @@ class Chat extends React.Component {
           autoFocus
           onKeyPress={this.submitMessage}
           onChange={this.handleTyping}
-          value={message.content}
+          value={message}
           className={classes.input}
         />
       </div>

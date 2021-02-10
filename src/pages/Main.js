@@ -1,23 +1,21 @@
 import { Component } from "react";
 import { connect } from "react-redux";
 import Channels from "../components/Channels/Channels";
-import ChannelUsers from "../components/Chat/ChannelUsers";
 import Chat from "../components/Chat/Chat";
 import Header from "../components/Header";
 import Servers from "../components/Servers/Servers";
+import ServerUsers from "../components/Servers/ServerUsers";
 import { setChannelRedux, setServerRedux } from "../redux/actions/appActions";
 
 class Main extends Component {
   componentDidMount = () => {
-    Notification.requestPermission().then(function (result) {
-
-    });
+ 
   };
 
   renderPane = (type) => {
-    const { selectedChannel, user } = this.props;
+    const { selectedServer, selectedChannel, user } = this.props;
     switch(type) {
-      case 'text': return <Chat user={user} selectedChannel={selectedChannel} />
+      case 'text': return <Chat user={user} selectedServer={selectedServer} selectedChannel={selectedChannel} />
 
       default: return <div/>
     }
@@ -35,7 +33,7 @@ class Main extends Component {
       user,
       mobileView,
     } = this.props;
-    const { id } = selectedChannel;
+    const { id } = selectedServer;
 
     return (
       <>
@@ -53,7 +51,7 @@ class Main extends Component {
           user={user}
         />
         { this.determineCenterPane(selectedChannel) }
-        {id ? <ChannelUsers /> : ""}
+        {id ? <ServerUsers selectedServer={selectedServer} /> : ""}
       </>
     );
   }

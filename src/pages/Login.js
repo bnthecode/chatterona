@@ -11,8 +11,9 @@ const Login = ({ logInUser, history }) => {
 
   const handleInitSignIn = () => {
    const environmentHandlers = {
-      development: () => {
-        logInUser({ user: config.devUser });
+      development: async () => {
+        const user = await userService.signInGoogle();
+        logInUser(user)
         history.push("/");
       },
       production: async () => {
