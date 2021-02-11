@@ -8,7 +8,6 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { useEffect, useState } from "react";
-import channelService from "../../http/channels-http";
 import ChannelHeader from "./ChannelHeader";
 import ChannelListItem from "./ChannelListItem";
 import CreateChannelDialog from "./CreateChannelDialog";
@@ -21,7 +20,6 @@ import {
   faPlus,
   faVolumeUp,
 } from "@fortawesome/free-solid-svg-icons";
-import db from "../../firebase";
 
 const useStyles = makeStyles(() => ({
   drawer: { backgroundColor: "#2f3136", width: "310px" },
@@ -95,12 +93,7 @@ const Channels = ({
   };
 
 
-  useEffect(() => {
-    const { id } = selectedServer;
-    if (id) {
-      channelService.registerChannelsListener(id, handleChannelEvents);
-    }
-  }, [selectedServer.id]); // eslint-disable-line react-hooks/exhaustive-deps
+ 
 
   const toggleDropdown = (type) => {
     setDropdownsOpen({
@@ -110,7 +103,6 @@ const Channels = ({
   };
 
   const handleAddChannel = async (channel) => {
-    await channelService.createChannel(selectedServer.id, channel);
     setChannelDialogOpen({ open: false });
   };
 

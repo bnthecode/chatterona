@@ -2,12 +2,10 @@ import { Divider, makeStyles } from "@material-ui/core";
 import Drawer from "../Drawer";
 import AddIcon from "@material-ui/icons/Add";
 import VideogameAssetIcon from "@material-ui/icons/VideogameAsset";
-import { channelService } from "../../services";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import ServerListItem from "./ServerListItem";
 import AddServerDialog from "../AddServerDialog/AddServerDialog";
-import serverService from "../../http/servers-http";
 
 const useStyles = makeStyles((theme) => ({
   "@global": {
@@ -48,29 +46,17 @@ const Servers = ({ setServer, setChannel, user }) => {
   const [showAddServerDialog, setAddServerDialogOpen] = useState(false);
   const isSelected = (id) => selected === id;
 
-  useEffect(() => {
-    serverService.registerServersListener(handleServerEvents);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleServerEvents = (servers) => {
-    if (servers && servers.length) {
-      setServers(servers);
-      setServer(servers[0]);
-      setSelected(servers[0].id);
-      setAddServerDialogOpen(false);
-    }
-  };
 
   const handleServerSelection = async (id) => {
     setSelected(id);
-    const foundServer = servers.find((svr) => svr.id === id);
-    setServer(foundServer);
-    const channels = await channelService.getChannels(id);
-    setChannel(channels.length ? channels[0] : {});
+
+
   };
 
   const handleAddServer = async (server) => {
-    await serverService.createServer(server);
+    setAddServerDialogOpen(false)
+    
   };
 
   const classes = useStyles();

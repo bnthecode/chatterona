@@ -4,17 +4,12 @@ import { Grid, Paper, TextField, Typography } from "@material-ui/core";
 import { withStyles } from "@material-ui/styles";
 import moment from "moment";
 import React from "react";
-import db, { firestore } from "../../firebase";
 import "../../utilities";
 import {
-  checkContentType,
-  checkUrlsContent,
   validateUrl,
 } from "../../utilities";
 import clsx from "clsx";
 import ChatItem from "./ChatItem";
-import channelService from "../../http/channels-http";
-import messageServices from "../../http/messages-http";
 
 const styles = (theme) => ({
   "@global": {
@@ -116,53 +111,17 @@ class Chat extends React.Component {
     message: "",
   };
 
-  componentDidMount = () => {
-    const { selectedChannel, selectedServer } = this.props;
-    if (selectedChannel.id && selectedServer.id) {
-      this.registerEventListeners(selectedServer.id, selectedChannel.id);
-    }
-  };
 
-  updateChannel = (data) => {
-    /// when channel gets updated.. typing and others
-  };
-
-  componentDidUpdate = (prevProps, prevState) => {
-    const { selectedChannel, selectedServer } = this.props;
-    if (prevProps.selectedChannel.id !== selectedChannel.id) {
-      this.registerEventListeners(selectedServer.id, selectedChannel.id);
-    }
-  };
-
-  registerEventListeners = (serverId, channelId) => {
-    channelService.registerChannelListener(
-      serverId,
-      channelId,
-      this.updateChannel
-    );
-    messageServices.registerMessagesListener(
-      serverId,
-      channelId,
-      this.handleMessageEvents
-    );
-  };
-
-  handleMessageEvents = (messages) => {
-    this.setState({ messages });
-    if (this.messageRef && this.messageRef.current) {
-      this.messageRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   addMessageToChannel = async () => {
-    const { message } = this.state;
+    // const { message } = this.state;
     this.setState({ userTyping: false, message: "" });
-    const { selectedChannel, selectedServer } = this.props;
-    await messageServices.createMessage(
-      selectedServer.id,
-      selectedChannel.id,
-      message
-    );
+    // const { selectedChannel, selectedServer } = this.props;
+    // await messageServices.createMessage(
+    //   selectedServer.id,
+    //   selectedChannel.id,
+    //   message
+    // );
   };
 
   handleTyping = (e) => {
@@ -182,29 +141,7 @@ class Chat extends React.Component {
     return !moment(currentDate).isSame(previousDate, "day");
   };
 
-  getUserTypings = () => {
-    const { usersTyping } = this.state;
-    const { user } = this.props;
-    let headline = "";
-    const typers = Object.keys(usersTyping).reduce((acc, key) => {
-      if (usersTyping[key].typing && usersTyping[key].name !== user.displayName)
-        acc = [...acc, usersTyping[key].name];
-      return acc;
-    }, []);
-    if (typers.length > 2) headline = "Holy cow! Too many people to count!";
-    else {
-      const join = typers.length === 1 ? " is" : " are";
-      headline = typers.length ? typers.join(", ") + `${join} typing...` : "";
-    }
-    return (
-      <span
-        id="user-typing"
-        style={{ fontSize: 11, fontWeight: 600, marginLeft: 8 }}
-      >
-        {headline}
-      </span>
-    );
-  };
+
   fileHandler = (e) => {
     //??
     // const { message } = this.state;
@@ -319,11 +256,11 @@ class Chat extends React.Component {
             )}
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "row" }}>
+        {/* <div style={{ display: "flex", flexDirection: "row" }}>
           <Typography className={classes.userTypings}>
             {this.getUserTypings()}
           </Typography>
-        </div>
+        </div> */}
 
         <TextField
           InputProps={{

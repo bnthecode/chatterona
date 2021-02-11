@@ -2,10 +2,10 @@ import {
   faEllipsisH,
   faLaughBeam,
   faPencilAlt,
-  faSmile,
+
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Paper, Tooltip, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import React, { useState } from "react";
 import EmojiPicker from "../EmojiPicker/EmojiPicker";

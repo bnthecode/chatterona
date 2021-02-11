@@ -5,20 +5,17 @@ import { connect } from "react-redux";
 import { logInUserRedux } from "../redux/actions/authActions";
 import GoogleLogo from "../images/google-logo.svg";
 import config from "../config";
-import { userService } from "../services";
 
 const Login = ({ logInUser, history }) => {
 
   const handleInitSignIn = () => {
    const environmentHandlers = {
       development: async () => {
-        const user = await userService.signInGoogle();
-        logInUser(user)
+        logInUser({user: config.devUser})
         history.push("/");
       },
       production: async () => {
-        const user = await userService.signInGoogle();
-        logInUser(user)
+        logInUser({user: config.devUser})
         history.push("/");
       },
     };
