@@ -9,9 +9,7 @@ import { setChannelRedux, setServerRedux } from "../redux/actions/appActions";
 
 class Main extends Component {
   componentDidMount = () => {
-    Notification.requestPermission().then(function (result) {
-
-    });
+    alert('bro')
   };
 
   renderPane = (type) => {
