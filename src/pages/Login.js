@@ -67,7 +67,7 @@ const Login = ({ logInUser, history }) => {
         Log in
       </Button>
       <span style={{ position: "absolute", color: 'white', bottom: 4, right: 0, fontSize: 12 }}>
-        2/8/21 6:14PM
+        UPDATE - TRES
       </span>
     </div>
   );
